@@ -1,7 +1,7 @@
 ---
 title: WKWebView
 author: Mattt
-translator: (Your Name Goes Here)
+translator: pilgwon
 category: Cocoa
 excerpt: iOS has a complicated relationship with the web.
   And it goes back to the very inception of the platform over a decade ago.
