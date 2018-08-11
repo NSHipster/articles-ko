@@ -1,7 +1,7 @@
 ---
 title: WKWebView
 author: Mattt
-translator: pilgwon
+translator: 김필권
 category: Cocoa
 excerpt: iOS와 웹은 꽤 복잡한 관계를 맺고 있습니다.
   이는 10년 전 플랫폼이 처음 생겼을 때부터 시작되었습니다.
