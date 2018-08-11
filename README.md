@@ -1,1 +1,1 @@
-# 한국어로 NSHipster 기사
+# 한국어 NSHipster 글 목록
