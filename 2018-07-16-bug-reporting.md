@@ -12,7 +12,7 @@ status:
 ---
 
 "Radar에 등록해."
-애플 플랫폼에서 개발하고 있다면 친근한 문장일 것입니다.
+애플 플랫폼에서 개발하는 분에게는 친근한 문장일 것입니다.
 
 
 It's what you hear when you complain about a wandering UIKit component.
