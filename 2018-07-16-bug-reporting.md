@@ -1,6 +1,7 @@
 ---
 title: Bug Reporting
 author: Mattt
+translator: 김필권
 category: ""
 excerpt:
     If you've ever been told to "file a Radar" 
