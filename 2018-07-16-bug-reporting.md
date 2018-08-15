@@ -1,312 +1,159 @@
 ---
 title: Bug Reporting
 author: Mattt
+translator: 김필권
 category: ""
 excerpt:
-    If you've ever been told to "file a Radar" 
-    and wondered what that meant, this week's article has just the fix.
+    "Radar에 신고해"라는 말을 듣고 그게 어떤 의미인지
+    궁금했던 적이 있다면 이 주의 게시글에서 해결해드리겠습니다.
 hiddenlang: ""
 status:
     swift: n/a
 ---
 
-"File a radar."
-It's a familiar refrain for those of us developing on Apple platforms.
+"Radar에 신고해."
+애플 플랫폼에서 개발하는 분에게는 친근한 문장일 것입니다.
 
-It's what you hear when you complain about
-a wandering UIKit component.<br/>
-It's the response you get when you share
-some hilariously outdated documentation.<br/>
-It's that voice inside your head
-when you reopen Xcode for the twelfth time today.
+아마도 종잡을 수 없는 UIKit 컴포넌트에 대해 불만을 토로할 때 또는 끔찍한 오래된 문서를 공유했을 때의 반응일 수도 있습니다. 아니면 하루에 12번 넘게 Xcode를 재시작할 때 머릿속에서 나올 말일 것입니다.
 
-If you've ever been told to "file a Radar" and wondered what that meant,
-this week's article has just the fix.
+"Radar에 신고해"라는 말을 듣고 그게 어떤 의미인지 궁금했던 적이 있다면 이 주의 게시글에서 해결해드리겠습니다.
 
 ---
 
-Radar is Apple's bug tracking software.
-Any employee working in an engineering capacity
-interacts with it on a daily basis.
+Radar는 애플의 버그 추적 소프트웨어입니다. 엔지니어링 관련 분야에 종사하고 계시다면 매일 상호작용하고 있을 것입니다. Radar는 소프트웨어, 하드웨어를 포함한 모든 곳(문서, 지역화, 웹 속성, 심지어 Siri에게서 받는 응답까지)의 기능이나 버그를 추적합니다.
 
-Radar is used to track features and bugs alike,
-in software, hardware, and everything else:
-documentation, localization, web properties ---
-heck, even the responses you get from Siri.
+애플 엔지니어가 "Radar"에 대해 들으면 가장 먼저 생각나는 것은 보라색 안테나 아이콘을 가진 Radar.app 앱입니다. Radar에서 가장 중요한 기능은 앱이나 데이터베이스가 아닌 문제 보고부터 마지막 검사까지 해주는 업무 흐름을 제공해주는 것입니다.
 
-When an Apple engineer hears the word "Radar",
-one of the first things that come to mind
-is the iconic purple anteater of Radar.app.
-But more important than the app or even the database itself,
-Radar is a workflow that guides problems from report to verification
-across the entire organization.
+Radar가 생성되면 유니크하고 영구적인 ID를 부여받습니다. Radar ID는 자동으로 증가하는(auto-incrementing) 정수라서 숫자만 보고도 어떤 버그인지 알 수도 있습니다. (지금 쓰고 있는 순간의 새로운 Radar는 4로 시작하는 8자리의 ID네요.)
 
-When a Radar is created,
-it's assigned a unique, permanent ID.
-Radar IDs are auto-incrementing integers,
-so you can get a general sense of when a bug was filed
-from the number alone.
-(At the time of writing,
-new Radars have 8-digit IDs starting with 4.)
+> Radar.app은 `rdar://` 커스텀 URL 스킴을 사용합니다.
+> 애플 엔지니어가 ID가 포함된 [rdar://xxxxxxxx](rdar://30000000) 링크를 누르면 바로 Radar가 열릴 것입니다.
+> 아닐 경우엔 이 링크를 눌러도 "rdar://xxxxxxxx URL을 열 수 있는 어플리케이션이 없습니다." 정도의 메세지만 받게 될 것입니다.
 
-> Radar.app uses the `rdar://` custom URL scheme.
-> If an Apple employee clicks a [rdar://xxxxxxxx](rdar://30000000) link
-> with an ID, it'll open directly to that Radar.
-> Otherwise, clicking this link pops up a dialog box with the message
-> "There is no application set to open the URL rdar://xxxxxxxx."
+## 외부 개발자로서 버그 제보하기
 
-## Reporting Bugs as External Developers
-
-Unfortunately for all of us not working at Apple,
-we can't access Radar directly.
-Instead, we have to file bugs through systems
-that interface with it indirectly.
+불행하게도 모두가 애플에서 일하는 것은 아니기 때문에 당장 Radar에 접근할 수는 없습니다. 대신에 우리가 보고 있는 인터페이스에서 간접적으로 버그를 제보할 수 있습니다.
 
 ### Apple Bug Reporter
 
-[Apple Bug Reporter](https://bugreport.apple.com)
-is the primary interface to Radar for external developers.
+[Apple Bug Reporter](https://bugreport.apple.com)는 외부 개발자들에게 열려있는 Radar의 기본 인터페이스입니다.
 
-Bug Reporter was recently updated to a modern web app
-that resembles Mail and other apps on
-[iCloud.com](https://icloud.com).
-For anyone who remembers its predecessor,
-I think you'll agree that this is a huge improvement.
+Bug Reporter는 메일앱이나 [iCloud.com](https://icloud.com)의 다른 앱처럼 최근에 모던 웹 앱으로 업데이트 되었습니다. 이전 것을 기억하는 분이 계시다면 그 업데이트는 정말 큰 일이었다고 동의하실 것입니다.
 
 {% asset apple-bug-reporter.png %}
 
-Choose the product related to the problem you're reporting
-and enter a descriptive title.
-If it's a bug,
-specify whether the kind of bug
-(Performance, Crash/Hang/Data Loss, UI/Usability, etc.)
-and how often you can produce it.
-Finally,
-write a description of the problem,
-including a summary,
-steps to reproduce,
-expected vs. actual results,
-and information about the configuration and version of your system.
+제보할 문제와 연관된 제품을 고르고 문제에 대한 제목을 입력하시면 됩니다. 이 문제가 버그라면 종류(퍼포먼스, 크래시/데이터 손실, UI/사용성 등)를 구체적으로 입력해주시고 얼마나 자주 그런 버그가 발생하는지도 적어주시면 좋습니다. 마지막으로 그 문제에 대한 설명을 요약, 재현하는 방법, 예상했던 결과와 실제 일어난 결과 그리고 설정에 대한 정보와 시스템 버전에 대한 정보를 모두 포함한 설명을 입력해주세요.
 
-This information is compiled into a Radar
-that is then triaged, assigned, prioritized, and scheduled
-by engineers.
+입력한 정보들은 Radar에 쌓이게 되고 그 다음엔 엔지니어들에 의해 분류, 할당, 우선순위 매기기, 그리고 계획이 정해집니다.
 
 ### Feedback Assistant
 
-If you're participating in the
-[Apple Beta Software Program](https://beta.apple.com/sp/betaprogram/welcome),
-and encounter a problem with your prerelease OS,
-you can alternatively report it using Feedback Assistant
-(find it on macOS and iOS with Spotlight).
+여러분이 애플의 [베타 소프트웨어 프로그램](https://beta.apple.com/sp/betaprogram/welcome)에 참가중인데 베타로 배포된 OS에 문제가 생겼다면 Feedback Assistant를 사용하세요. (macOS와 iOS의 스팟라이트에서 찾을 수 있습니다.)
 
 {% asset feedback-assistant.png %}
 
-Feedback Assistant offers a more streamlined experience
-that's optimized for providing feedback about the platform you're living on.
-It automatically captures a sysdiagnose
-and other information about your system
-in order to diagnose the problem you're encountering more accurately.
+Feedback Assistant는 여러분이 사용중인 플랫폼에 의견을 제공하는 것에 최적화된 경험을 제공합니다. 이 도구는 여러분이 마주한 문제를 더 정확하게 해결할 수 있도록 자동으로 여러분의 시스템에 대한 정보를 자동으로 캡쳐합니다.
 
-Whereas Bug Reporter is your first choice
-for problems directly related to your work,
-Feedback Assistant is often a more convenient option
-for any bumps you encounter in your day-to-day.
+Bug Reporter는 작업과 직접적으로 관련된 문제에 대한 선택지인 반면에, Feedback Assistant는 매일 매일 마주하는 버그에 대한 더 간편한 선택지입니다.
 
-## Third-Party Bug Reporting Tools
+## 써드파티 버그 리포팅 도구
 
-When developers encounter a problem,
-they're motivated to do something about it
-rather than merely complain.
-This is the reason they file bug reports in the first place.
+개발자가 문제를 마주했을 때 그들은 단순히 불평하는 것보다 문제를 해결하는 것에 동기 부여를 받습니다. 이것이 개발자가 처음에 버그 리포트를 제출하는 이유입니다.
 
-This is, incidentally, the same motivation
-that compels us to create tools to fix problems that we find
-in the bug reporting process itself.
+또한 버그 리포팅 과정 자체의 문제를 해결하는 도구를 만드는 일에서도 비슷한 동기 부여를 받을 수 있습니다.
 
-Here are some essential tools for bug reporting
-from the Apple developer community:
+애플 개발자 커뮤니티에서 정한 필수적인 버그 리포팅 도구를 정리해봤습니다.
 
 ### Open Radar
 
-The fundamental problem with Radar as an external developer
-is lack of transparency.
-One of the ways this manifests itself is that
-there's no way to know what anyone else has reported.
-All too often,
-you'll invest a good deal of time writing up a detailed summary
-and creating a reproducible test case
-only to have the bug unceremoniously closed as a duplicate.
+외부 개발자의 입장에서 Radar의 근본적인 문제는 투명성의 부족입니다. 그 증거 중 하나는 다른 사람들이 무엇을 보고했는지를 알 수 있는 방법이 없다는 것입니다. 자세한 요약을 작성하고 재현 가능한 테스트 케이스까지 열심히 적었지만 그 버그가 인정사정없이 중복이라고 닫히는 경우도 자주있습니다.
 
-[OpenRadar](https://openradar.appspot.com), created by
-[Tim Burks](https://github.com/timburks),
-is a public database of bugs reported to Apple.
-Over the many years of its existence,
-OpenRadar has become the de facto way
-for us to coordinate our bug reports.
+[Tim Burks](https://github.com/timburks)의 [OpenRadar](https://openradar.appspot.com)는 애플에 리포트된 버그의 공공 데이터베이스 역할을 합니다. 지난 몇 년간 OpenRadar는 버그 리포트를 조직화하는 실질적인 방법이 되었습니다.
 
 {% asset open-radar.png %}
 
-When you file a Radar with apple,
-you're encouraged to also
-[file it with OpenRadar](https://openradar.appspot.com/myradars/add)
-(unless it's something that shouldn't be disclosed publicly).
-Your contribution can help anyone else
-who might have the same problem in the future.
+애플의 Radar에 신고할 때 [OpenRadar에도 신고](https://openradar.appspot.com/myradars/add)해주시길 바랍니다(공개해도 되는 내용이 아니라면 말이죠). 여러분의 공헌은 같은 문제를 가진 미래의 누군가를 도울 수 있을 것입니다.
 
 ### Brisk
 
-Although the recently-overhauled Bug Reporter web app is quite nice to use,
-there's no replacement for a native app.
+최근 정비된 Bug Reporter 웹 앱이 사용하기 꽤 편해졌다고 해도 네이티브 앱을 대체할 수는 없습니다.
 
-[Brisk](https://github.com/br1sk/brisk/),
-created by [Keith Smiley](https://github.com/keith),
-is a macOS app for filing Radars through Apple's Bug Reporter.
-It's a fully-featured app,
-with support for two-factor authentication,
-saving radars as drafts,
-automatically duping radars by ID,
-and even opening `rdar://` URLs.
-But its killer feature is the ability to cross-post bug reports to Open Radar.
+[Keith Smiley](https://github.com/keith)의 [Brisk](https://github.com/br1sk/brisk/)는 애플의 Bug Reporter를 이용해서 Radar에 신고할 수 있는 macOS 앱입니다. 이 앱은 이중 인증, radar 임시 저장, `rdar://` URL을 열 수 있게 자동으로 바꿔치기 하는 등 필요한 모든 기능을 제공합니다. 하지만 그 중에서도 가장 멋진 기능은 Open Radar에도 동시에 올릴 수 있게 해주는 cross-post 입니다.
 
 {% asset brisk-app.png %}
 
-To get started,
-[download the latest release](https://github.com/br1sk/brisk/releases/latest)
-from GitHub
-or install via [Homebrew](https://brew.sh) with the following command:
+시작하기 위해선 [최신 버전](https://github.com/br1sk/brisk/releases/latest)을 GitHub에서 받거나 [Homebrew](https://brew.sh)에서 다음 커맨드를 통해 설치하면 됩니다.
 
 `$ brew cask install Brisk`
 
-## Advice for Writing a _Good_ Bug Report
+## _좋은_ 버그 리포트 작성하는 방법
 
-So now that you know how to write a bug report
-let's talk about how to write a good one.
+이제 버그 리포트를 작성하는 법은 아셨을테니 좋은 버그 리포트를 작성하는 방법에 대해 얘기해봅시다.
 
-### One Problem, One Bug Report
+### 하나의 문제엔 하나의 버그 리포트만
 
-You won't be doing anyone any favors
-by reporting multiple bugs in the same report.
-Each additional concern you raise makes it
-both more difficult to understand
-and less actionable for the assigned engineer.
+하나의 버그 리포트에 여러개의 버그를 적는 것은 전혀 도움이 안됩니다. 추가로 우려 사항을 제기하는 것은 할당된 엔지니어의 이해를 어렵고 힘들게 해서 실용적이지 않은 결과를 초래합니다.
 
-Instead, file multiple Radars
-and reference any related problems by ID in your summary.
+대신에 여러 개의 Radar를 신고하고 관련된 문제를 요약에 ID로 알려주면 됩니다.
 
-### Choose a Title Strategically
+### 전략적으로 제목을 지으세요
 
-Before an issue can start to be resolved by an engineer,
-it needs to find its way to them.
-The best way to ensure things get to the right person
-is to surface the most important information in the title.
+문제가 더 빨리 잘 해결되기 위한 가장 좋은 방법은 딱 맞는 엔지니어에게 할당되는 것입니다. 그러기 위해서는 중요한 정보를 제목에 보여주는 것이 좋습니다.
 
-- For problems about an API,
-  put the fully-qualified symbol name in the title
-  (for example, `URLSession.dataTaskWithRequest(_:)`).
-- For problems related to documentation,
-  include the full list of navigation breadcrumbs in the title
-  (for example,
-  "Foundation > URL Loading System > URLSession > dataTaskWithRequest:").
-- For problems with a particular app,
-  reference the app name, version, and build number,
-  which are found in the "About" info box
-  (for example, "Xcode 10.0 beta (10L176w)").
+- API에 대한 문제라면 심볼을 모두 제목에 넣는 것이 좋습니다. (예: `URLSession.dataTaskWithRequest(_:)`)
 
-### Don't Be Antagonistic
+- 문서에 관련된 문제라면 네비게이션의 모든 목록을 제목에 포함해주세요. (예: "Foundation > URL Loading System > URLSession > dataTaskWithRequest:")
 
-Chances are, you're not at your cheeriest when you're writing a bug report.
+- 특정 앱에 대한 문제일 경우엔 앱 이름, 버전 그리고 빌드 번호를 참조해주세요. 이 정보는 "About" 정보 창에서 찾을 수 있습니다. (예: "Xcode 10.0 beta (10L176w)")
 
-It's unacceptable that this doesn't work as expected.
-You wasted hours trying to debug this problem.
-Apple doesn't care about software quality anymore.
+### 적대적인 태도는 좋지 않습니다
 
-That sucks. We get it.
+아마도 여러분이 버그 리포트를 작성할 때는 기분이 그렇게 좋진 않을 것입니다.
 
-However, none of that is going to solve your problem any faster.
-If anything,
-hostility will make an engineer less likely to address your concern.
+예상한 대로 작동하지 않는 것은 수용 할 수 없어.
+난 이 문제를 디버깅하기 위해 시간을 버렸어.
+애플은 소프트웨어 퀄리티에 대해 신경쓰지 않아.
 
-Remember that there's a person on the other end of your bug report.
-Practice [empathy](https://nshipster.com/empathy/).
+짜증나죠. 모두 이해합니다.
 
-> Peter Steinberger has more great advice on the subject
-> [in this blog post](https://pspdfkit.com/blog/2016/writing-good-bug-reports/).
+하지만 그 중에 어떤 것도 문제가 더 빨리 해결되는데에 도움이 되지 않습니다. 무엇보다 적대적인 태도는 엔지니어가 여러분의 문제를 찾을 확률이 더 낮아질 뿐입니다.
 
-## How to Signal Boost Bug Reports
+버그 리포트를 받는 것도 우리와 같은 사람이라는 사실을 기억하세요. [공감 능력](https://nshipster.com/empathy/)을 익히세요.
 
-External developers may often liken the experience of filing a Radar
-to sending a message into a black hole.
-With thousands of new Radars coming in every hour,
-the odds of the right person seeing your bug report
-in a timely manner seem impossibly small.
+> Peter Steinberger의 좋은 버그 리포트를 작성하는 방법을 기록한 훌륭한 조언을 [그의 블로그](https://pspdfkit.com/blog/2016/writing-good-bug-reports/)에서 확인할 수 있습니다.
 
-Fortunately, there are a few things you can do to help your chances:
+## 버그 리포트의 신호를 증폭시키는 법
 
-### Duplicating Existing Radars
+외부 개발자들은 종종 Radar에 신고하는 것이 블랙 홀에 메시지를 보내는 것같은 느낌을 받은 경험이 있을 것입니다. 매 시간 수 천 개의 새로운 Radar가 생기기 때문에 담당자가 여러분의 버그 리포트를 자세히 읽어보는 것은 거의 불가능에 가깝기 때문에 어쩔 수 없습니다.
 
-In Apple's bug triage workflow,
-each problem is (ideally) tracked by a single Radar.
-If multiple Radars seem to report the same underlying problem,
-the oldest or most specific one is kept around
-while the others are closed as duplicates.
-This resolution can be frustrating for external developers,
-as this is often the last word they hear about a problem they're having ---
-particularly if the original Radar isn't visible to them.
+다행스럽게도 여러분의 버그 리포트가 잘 받아들여지게 도와주는 방법이 있습니다.
 
-That said, having your bug closed as a duplicate isn't always a bad thing.
-You can knowingly file a duplicate of an existing Radar as a way to
-say _"I have this problem, too"_ and _"Please fix this first"_.
-However annoying this might be for the Apple engineer responsible for triage,
-part of me can't help projecting a courage to those doomed bug reports,
-who courageously sacrifice themselves in the name of software quality.
+### 기존 Radar 복제하기
+
+애플의 버그 분류 작업 흐름에선 각 문제는 하나의 Radar로 추적됩니다. 만약 여러 개의 Radar가 같은 문제를 리포트하고 있다면 가장 오래되거나 제일 구체적인 것만 남고 나머지는 모두 중복으로 닫힐 것입니다. 이 해결책은 외부 개발자에게 실망스러울 수 있습니다. 특히 Radar가 보이지 않는 사람들에겐 마지막 단어가 그들이 들었던 말일 것이기 때문입니다.
+
+그래도 그 말은 여러분의 버그가 중복으로 닫히는 것은 항상 나쁜 것만은 아니라는 점입니다. 여러분은 의도적으로 기존의 Radar 복사본을 신고하면서 _"저도 이런 문제를 가지고 있어요"_ 나 _"이것 먼저 수정해주세요"_ 라고 할 수 있습니다. 이것이 애플 엔지니어들을 귀찮게 하는 일이라 해도 우리는 소프트웨어 품질이라는 이름 하에 버그 리포트를 할 용기를 가져야 합니다.
+
 _Semper fidelis_, buggos.
 
-### Twitter
+### 트위터
 
-Some teams within Apple are quite responsive to feedback on Twitter.
-It's hard to stay in-the-loop when you're in The Loop,
-so engineers and higher-ups alike often tune in
-to channel the _vox populi_.
+애플의 몇몇 팀은 트위터의 피드백에 반응을 잘 해주는 편입니다. 루프 안에 있을 때는 루프에 있는 것을 유지하기 힘들기 때문에 엔지니어와 윗사람 모두 _vox popili (사람들의 목소리)_ 에 채널을 맞춰둡니다.
 
-Due to the chilling nature of Apple's social media policies,
-you're unlikely ever to hear anything back.
-But rest assured that your Tweets are showing up
-on a saved Twitter search somewhere in Cupertino.
+애플의 차가운 소셜 미디어 정책으로 인해 여러분은 모든 것에 대한 답변을 듣기는 힘들 수 있습니다. 하지만 여러분의 트윗은 쿠퍼티노에 있는 누군가의 검색 결과에는 나올 것입니다.
 
-### Blogging
+### 블로깅
 
-Apple engineers are developers like you or me,
-and many of them pay attention to what we're writing about.
-In addition to being helpful to fellow developers,
-a simple write-up may be just the thing that convinces
-that one engineer to take another look.
+애플 엔지니어들은 여러분과 같은 개발자입니다. 그리고 대부분은 우리가 작성하는 것에 관심을 가지고 있습니다. 게다가 블로그에 글을 쓰는 것은 동료 개발자들에게도 도움되는 일입니다
 
 ---
 
-Speaking from my personal experience working at Apple,
-Radar is far and away the best bug tracking systems I've ever used.
-So it can be frustrating to be back on the outside looking in,
-knowing full well what we're missing out on as external developers.
+애플에서 일했던 제 개인적인 경험을 기반으로 말하자면 Radar는 제가 사용해본 가장 좋은 버그 추적 시스템입니다. 그래서 외부 개발자로써 놓치고 있는 것을 잘 알고 있는 상태로 바깥에서 안쪽을 보는 것은 좌절감을 주기도 합니다.
 
-In contrast to open source software,
-which empowers anyone to fix whatever bugs they might encounter,
-the majority of Apple software is proprietary;
-there's often very little that we can do.
-Our only option is to file a bug report and hope for the best.
+오픈 소스 소프트웨어는 버그를 마주치는 사람이 고칠 수 있도록 권한을 제공하는 것과는 대조적으로 애플 소프트웨어의 대부분은 소유권이 있습니다. 우리가 할 수 있는 일이 그렇게 많지 않다는 뜻이죠. 우리가 할 수 있는 단 하나의 선택지는 버그를 제보하고 이게 최선이길 바라는 것 뿐입니다.
 
-Fortunately, things have gotten better.
-The new Bug Reporter site is excellent,
-and the process itself appears to be moving towards greater transparency:
+다행히도 상황은 꽤 나아졌습니다. 새로운 Bug Reporter 사이트는 훌륭하고 과정 자체의 투명성도 점점 나아지고 있습니다.
 
-> Encouraging change on @apple’s bug reporter…
-> I’ve been hearing of people now getting notified
-> when an original is “awaiting verification”,
-> and not just “closed”"
-> <cite>Dave DeLong ([@davedelong](https://twitter.com/davedelong))
-> [via Twitter](https://twitter.com/davedelong/status/1017853619717079040)</cite>
+> @apple 버그 제보기의 변화를 응원합니다! 이제 단순히 "닫힘" 알림을 받는 것이 아닌 "검사 대기중"처럼 변경된 알림을 받았다는 얘기를 많이 들었습니다. <cite>Dave DeLong ([@davedelong](https://twitter.com/davedelong)) [Twitter](https://twitter.com/davedelong/status/1017853619717079040)</cite>
 
-The only way things continue to improve is if we communicate.
-
-So the next time you find something amiss, remember:
-"file a radar".
+이 변화가 지속되기 위해서는 우리가 꾸준한 소통을 해야합니다. 다음부턴 잘못된 것이 있을 때 이렇게 말해주세요, "Radar에 신고해!"
