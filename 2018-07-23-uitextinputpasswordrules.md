@@ -1,122 +1,62 @@
 ---
 title: "Password Rules / UITextInputPasswordRules"
 author: Mattt
+translator: 김필권
 category: "Cocoa"
-excerpt: 
-    Unless it's the title of a hacker movie from the 90's
-    or the solution to an escape room puzzle,
-    a password should be utterly devoid of meaning.
+excerpt: "90년대의 해커 영화의 제목이나 방탈출의 해결법이 아닌 이상 비밀번호는 반드시 의미가 없어야 합니다."
 hiddenlang: ""
 status:
     swift: "4.2"
 ---
 
-It's no wonder why hipsters obsess over artisanal _this_ and handcrafted _that_.
-Whether it's a thick slice of avocado toast,
-a bottle of small batch (nondairy) golden milk,
-or a perfect cup of pour-over coffee ---
-there's no replacement for a human touch.
+힙스터들이 _이것_ 에 과하게 장인정신을 가졌고 _저것_ 을 직접 만든것은 조금도 이상한 일이 아닙니다. 그것은 두꺼운 조각의 아보카도 토스트일 수도 있고, 작은 무지방 황금 우유일 수도 있으며 완벽한 한 잔의 푸어 오버 커피일 수도 있습니다. 이 모든 것들의 공통점은 완성하려면 인간의 손길이 필요하다는 것입니다.
 
-In stark contrast,
-good passwords are the opposite of artisanal.
-Unless it's the title of a hacker movie from the 90's
-or the solution to an escape room puzzle,
-a password should be utterly devoid of meaning.
+앞의 것들과는 아주 대조적으로 좋은 비밀번호는 장인정신과는 정반대에 있습니다. 90년대의 해커 영화의 제목이나 방탈출의 해결법이 아닌 이상 비밀번호는 반드시 의미가 없어야 합니다.
 
-With Safari in iOS 12 and macOS Mojave,
-it'll be easier than ever to generate
-the strongest,
-most meaningless,
-most impossible-to-guess passwords imaginable ---
-all thanks to a few new features.
+그런 의미에서 iOS 12와 macOS Mojave의 Safari의 새로운 기능은 정말 반가운 기능입니다. 이제 비밀번호 생성이 더욱 강력하고 의미 없어지며 더 추측 불가능해집니다.
 
 ---
 
-An ideal password policy is simple:
-Enforce a minimum number of characters (at least 8)
-and allow for longer passwords (64 or more).
+이상적인 비밀번호 정책은 간단합니다. 최소한의 글자수를 강제하고 (최소 8글자) 긴 글자수(64글자 또는 더 많이)도 허용해주는 것입니다.
 
-Anything more elaborate, be it
-pre-selected security questions,
-periodic password expiration,
-or arcane character requirements
-do little more than annoy the people these policies try to protect.
+더 정교한 시스템을 생각한다면 미리 선택된 보안 질문과 정기적인 비밀번호 기간 만료 또는 불가사의한 글자를 입력하는 기능을 넣어서 사람들의 비밀번호를 보호하세요.
 
-> But don't take my word for it ---
-> I'm not a security expert.
->
-> Instead,
-> check out the latest
-> [Digital Identity Guidelines](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf)
-> from
-> <abbr title="National Institute of Standards and Technology">NIST</abbr>
-> (published June 2017).
+> 하지만 저도 보안 전문가는 아니기 때문에 완벽한 방법은 아닙니다.
+> 더 좋은 방법은 <abbr title="National Institute of Standards and Technology">NIST</abbr>에서 발행한 [Digital Identity Guidelines](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf)을 확인하는 것입니다. (2017년 6월에 발행되었습니다)
 
-The good news is that more companies and organizations
-are starting to pay attention to security best practices.
-The bad news is that it took
-a series of massive data breaches affecting millions of people
-in order for things to change.
-And the ugly truth is that
-because corporations and governments take forever to do anything,
-many of the aforementioned security anti-patterns aren't going away anytime soon.
+좋은 소식은 많은 단체와 회사들이 보안에 더 많은 신경을 쓰기 시작했다는 것입니다. 나쁜 소식은 이러한 변화를 위해 수백만의 사람들이 데이터 결함을 겪어야 한다는 것입니다. 그리고 알고 싶지 않은 사실이 있다면, 기업과 정부가 아무것도 하고있지 않기 때문에 앞서 말한 보안에 위반되는 패턴들이 당장은 사라지지 않을 거라는 것입니다.
 
 ## Automatic Strong Passwords
 
-Safari AutoFill has been able to generate passwords since iOS 8,
-but one of its shortcomings was that it couldn't guarantee
-that a generated password satisfied the requirements of a particular service.
+Safari의 AutoFill은 iOS 8부터 비밀번호 생성이 가능했지만 그 단점 중 하나는 생성된 비밀번호가 특정 서비스에 만족하는지는 보장되지 않는다는 점이었습니다.
 
-Apple aims to solve this problem with a new Automatic Strong Passwords feature
-in Safari, iOS 12, and macOS Mojave.
+Apple은 이 문제를 해결하는 것을 목표로 새로운 Automatic Strong Password 기능을 iOS 12와 macOS Mojave의 Safari에서 공개했습니다.
 
-WebKit engineer Daniel Bates submitted
-[this proposal](https://github.com/whatwg/html/issues/3518)
-for consideration to the
-<abbr title="Web Hypertext Application Technology Working Group">WHATWG</abbr>
-on March 1st.
-On June 6th,
-the WebKit team
-[announced Safari Technology Preview Release 58](https://webkit.org/blog/8327/safari-technology-preview-58-with-safari-12-features-is-now-available/),
-with support for strong password generation
-using the new `passwordrules` attribute.
-This announcement coincided with the release iOS 12 beta SDKs at WWDC,
-which included a new `UITextInputPasswordRules` API,
-along with a number of other password management features,
-including Security Code AutoFill and federated authentication.
+WebKit 엔지니어인 Daniel Bates는 <abbr title="Web Hypertext Application Technology Working Group">WHATWG</abbr>에 [이 제안](https://github.com/whatwg/html/issues/3518)을 3월 1일에 제출했습니다. 6월 6일에 WebKit 팀은 [Safari Technology Preview Release 58](https://webkit.org/blog/8327/safari-technology-preview-58-with-safari-12-features-is-now-available/)을 발표했고 이 버전에는 `passwordrules` 속성을 사용해서 강력한 비밀번호 생성하는 기능이 포함되어 있었습니다. 그리고 같은 시간 WWDC에서는 `UITextInputPasswordRules` API와 Security Code AutoFill, 연합 인증 (federated authentication)과 같은 비밀번호 관리 기능 `UITextInputPasswordRules` API가 포함된 iOS 12 베타 SDK가 릴리즈되었습니다.
 
-## Password Rules
+## 비밀번호 규칙 (Password Rules)
 
-Password rules are like a recipe for password generators.
-By following a few simple rules,
-the password generator can randomly generate new, secure passwords
-that comply with the particular requirements of the service provider.
+비밀번호 규칙은 비밀번호 생성기의 레시피라고 생각하시면 됩니다. 비밀번호 생성기는 몇가지 간단한 규칙을 따르면서 무작위로 새롭고 보안적으로 튼튼하며 서비스 제공자들의 구체적인 요구에도 통과하는 비밀번호를 만들어줍니다.
 
-Password rules consist of one or more key-value pairs
-in the following form:
+비밀번호 규칙은 다음과 같은 모양의 하나 또는 그 이상의 키-밸류 쌍으로 이루어져 있습니다.
 
 `required: lower; required: upper; required: digit; allowed: ascii-printable; max-consecutive: 3;`
 
-### Keys
+### 키 (Keys)
 
-Each rule may specify one of the following keys:
+하나의 키는 각각의 규칙을 구체적으로 가지고 있습니다.
 
-- `required`: The kinds of characters that are required
-- `allowed`: The kinds of characters that are allowed
-- `max-consecutive`: The maximum number of consecutive characters allowed
-- `minlength`: The minimum password length
-- `maxlength`: The maximum password length
+- `required`: 비밀번호에서 요구로 하는 문자의 종류
+- `allowed`: 비밀번호에서 사용할 수 있는 문자의 종류
+- `max-consecutive`: 연속으로 사용할 수 있는 문자의 수
+- `minlength`: 비밀번호 최대 길이
+- `maxlength`: 비밀번호 최소 길이
 
-The `required` and `allowed` keys
-have one of the character classes listed below as their value.
-The `max-consecutive`, `minlength`, and `maxlength` keys
-have a nonnegative integer as their value.
+`required`와 `allowed` 키는 아래에서 나열한 값 중 하나를 그것의 값으로 가집니다. `max-consecutive`, `minlength`, `maxlength` 키는 0이상의 정수를 값으로 가집니다.
 
-### Character Classes
+### 문자 클래스 (Character Class)
 
-The `required` and `allowed` keys
-may have any one of the following named character classes
-as their value.
+`required`와 `allowed` 키는 다음 목록 중 하나 이상의 값을 가집니다.
 
 - `upper` (`A-Z`)
 - `lower` (`a-z`)
@@ -125,34 +65,21 @@ as their value.
 - `ascii-printable` (U+0020 — 007f)
 - `unicode` (U+0 — 10FFFF)
 
-In addition to these presets,
-you may specify a custom character class
-with ASCII characters surrounded by square brackets
-(for example, `[abc]`).
+이 설정값 외에도, 중괄호로 둘러싸인 ASCII 문자열을 커스텀 문자열 클래스로 지정할 수도 있습니다. (예: `[abc]`)
 
 ---
 
-Apple's
-[Password Rules Validation Tool](https://developer.apple.com/password-rules/)
-allows you to experiment with different rules
-and get real-time feedback of their results.
-You can even generate and download passwords by the thousands
-to use during development and testing!
+Apple의 [Password Rules Validation Tool](https://developer.apple.com/password-rules/)은 우리가 다양한 규칙으로 실시간 피드백을 받을 수 있는 실험을 가능하게 해줍니다. 심지어 개발과 테스트를 하는 동안 사용할 수천개의 비밀번호를 생성하고 다운로드 받을 수도 있습니다!
 
 {% asset password-rules-validation-tool.png alt="Password Rules Validation Tool" %}
 
-For more information about Password Rules syntax,
-check out Apple's
-["Customizing Password AutoFill Rules"](https://developer.apple.com/documentation/security/password_autofill/customizing_password_autofill_rules).
+비밀번호 규칙 문법에 대해 더 자세히 알고 싶다면 Apple의 ["Customizing Password AutoFill Rules"](https://developer.apple.com/documentation/security/password_autofill/customizing_password_autofill_rules)를 참고하세요.
 
 ---
 
-## Specifying Password Rules
+## 비밀번호 규칙 지정하기
 
-On iOS,
-you set the `passwordRules` property of a `UITextField`
-with a `UITextInputPasswordRules` object
-(you should also set the `textContentType` to `.newPassword` while you're at it):
+iOS에서는 `UITextField`의 `passwordRules` 속성을 `UITextInputPasswordRules` 객체를 사용해서 지정할 수 있습니다. (또한 `textContentType`을 `.newPassword`로 지정하셔야 합니다.)
 
 ```swift
 let newPasswordTextField = UITextField()
@@ -160,28 +87,20 @@ newPasswordTextField.textContentType = .newPassword
 newPasswordTextField.passwordRules = UITextInputPasswordRules(descriptor: "required: upper; required: lower; required: digit; max-consecutive: 2; minlength: 8;")
 ```
 
-On the web,
-you set the `passwordrules` attribute
-to an `<input>` element with `type="password"`:
+웹에서는 `<input>` 요소의 `passwordRules` 속성을 `type="password"` 와 함께 입력하시면 됩니다.
 
 ```html
 <input type="password" passwordrules="required: upper; required: lower; required: special; max-consecutive: 3;"/>
 ```
 
-> If unspecified,
-> the default password rule is
-> `allowed: ascii-printable`.
-> Though if your form has a password confirmation field,
-> it will automatically follow the rules from the preceding field.
+> 만약 따로 지정하지 않는다면 기본 비밀번호 규칙은 `allowed: ascii-printable` 이 됩니다.
+> 입력 폼에 비밀번호 확인 필드가 존재한다면 자동으로 이전 필드의 규칙을 가져올 것입니다.
 
-## Generating Password Rules in Swift
+## Swift에서 비밀번호 규칙 생성하기
 
-If the thought of working with a string-based format
-without a proper abstraction gives you the heebie-jeebies,
-you're not alone.
+적절한 추상 없이 문자열 기반으로 작업하는 것이 끔찍하다고 느끼신다면 혼자가 아니십니다.
 
-Here's one way to encapsulate Password Rules in a Swift API
-([also available as a Swift package](https://github.com/NSHipster/PasswordRules)):
+다음은 Swift API로 비밀번호 규칙을 만드는 방법에 대해 요약입니다. ([Swift 패키지에서도 사용가능합니다!](https://github.com/NSHipster/PasswordRules))
 
 ```swift
 enum PasswordRule {
@@ -230,9 +149,8 @@ extension PasswordRule.CharacterClass: CustomStringConvertible {
 }
 ```
 
-With this in place,
-we can now specify a series of rules in code
-and use them to generate a string with valid password rules syntax:
+위의 예제대로 입력하면 이제 코드 상에서 규칙을 지정할 수 있고 유효한 비밀번호 규칙 문법을 통해 비밀번호를 생성할 수도 있게됩니다.
+
 
 ```swift
 let rules: [PasswordRule] = [ .required(.upper),
@@ -246,10 +164,7 @@ let descriptor = rules.map{ "\($0.description);" }
 // "required: upper; required: lower; required: special; max-consecutive: 3;"
 ```
 
-If you feel so inclined,
-you could even extend `UITextInputPasswordRules`
-to provide a convenience initializer
-that takes an array of `PasswordRule` values:
+마음이 내키신다면 `UITextInputPasswordRules` 를 익스텐션으로 만들어서 `PasswordRule` 값의 배열을 변환하는 간편한 이니셜라이저를 제공하게 만들 수도 있습니다.
 
 ```swift
 extension UITextInputPasswordRules {
@@ -264,17 +179,8 @@ extension UITextInputPasswordRules {
 
 ---
 
-If you're the sentimental type when it comes to personal credentials,
-and enjoy name dropping your college or dog or favorite sports team
-behind the anonymous bullets of password input fields,
-please consider reforming your ways.
+여러분이 개인 보안에 관해서 감상적이거나, 출신 대학교, 키우는 강아지 또는 좋아하는 스포츠 팀을 비밀번호에 넣는 것을 즐기는 타입이라면, 반드시 그 방식을 바꾸는 것을 추천드립니다.
 
-Speaking personally,
-I can't imagine going about my day-to-day without my password manager.
-It's hard to overstate the peace of mind you get
-by knowing that any information you ever needed
-is accessible to you --- and only you --- whenever you need it.
+개인적으로 말씀드리자면 저는 비밀번호 관리기가 하루라도 없는 것을 상상할 수 없습니다.
 
-By taking this step now,
-you'll be able to take full advantage of these improvements
-coming to Safari when iOS 12 and macOS Mojave arrive later this year.
+이 글에 나온 예제들을 모두 따라해보셨다면 올해 말에 나올 iOS 12와 macOS Mojave의 Safari에서 발전된 기능을 완벽하게 활용할 수 있을 것입니다.
