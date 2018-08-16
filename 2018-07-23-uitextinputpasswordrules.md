@@ -3,7 +3,7 @@ title: "Password Rules / UITextInputPasswordRules"
 author: Mattt
 translator: 김필권
 category: "Cocoa"
-excerpt: 90년대의 해커 영화의 제목이나 방탈출의 해결법이 아닌 이상 비밀번호는 반드시 의미가 없어야 합니다.
+excerpt: "90년대의 해커 영화의 제목이나 방탈출의 해결법이 아닌 이상 비밀번호는 반드시 의미가 없어야 합니다."
 hiddenlang: ""
 status:
     swift: "4.2"
