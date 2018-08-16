@@ -42,7 +42,7 @@ WebKit 엔지니어인 Daniel Bates는 <abbr title="Web Hypertext Application Te
 
 `required: lower; required: upper; required: digit; allowed: ascii-printable; max-consecutive: 3;`
 
-### 키
+### 키 (Keys)
 
 하나의 키는 각각의 규칙을 구체적으로 가지고 있습니다.
 
@@ -54,7 +54,7 @@ WebKit 엔지니어인 Daniel Bates는 <abbr title="Web Hypertext Application Te
 
 `required`와 `allowed` 키는 아래에서 나열한 값 중 하나를 그것의 값으로 가집니다. `max-consecutive`, `minlength`, `maxlength` 키는 0이상의 정수를 값으로 가집니다.
 
-### 문자 클래스
+### 문자 클래스 (Character Class)
 
 `required`와 `allowed` 키는 다음 목록 중 하나 이상의 값을 가집니다.
 
@@ -149,7 +149,7 @@ extension PasswordRule.CharacterClass: CustomStringConvertible {
 }
 ```
 
-With this in place, we can now specify a series of rules in code and use them to generate a string with valid password rules syntax:
+위의 예제대로 입력하면 이제 코드 상에서 규칙을 지정할 수 있고 유효한 비밀번호 규칙 문법을 통해 비밀번호를 생성할 수도 있게됩니다.
 
 
 ```swift
@@ -179,8 +179,8 @@ extension UITextInputPasswordRules {
 
 ---
 
-여러분이 개인 보안에 관해서 감상적이거나 출신 대학교나 키우는 강아지 또는 좋아하는 스포츠 팀을 비밀번호에 넣는 것을 즐기는 타입이라면, 반드시 그 방식을 바꾸는 것을 추천드립니다.
+여러분이 개인 보안에 관해서 감상적이거나, 출신 대학교, 키우는 강아지 또는 좋아하는 스포츠 팀을 비밀번호에 넣는 것을 즐기는 타입이라면, 반드시 그 방식을 바꾸는 것을 추천드립니다.
 
 개인적으로 말씀드리자면 저는 비밀번호 관리기가 하루라도 없는 것을 상상할 수 없습니다.
 
-여러분이 이 글에 나온 예제들을 모두 따라해보셨다면 올해 말에 나올 iOS 12와 macOS Mojave의 Safari에서 발전된 기능을 완벽하게 활용할 수 있을 것입니다.
+이 글에 나온 예제들을 모두 따라해보셨다면 올해 말에 나올 iOS 12와 macOS Mojave의 Safari에서 발전된 기능을 완벽하게 활용할 수 있을 것입니다.
