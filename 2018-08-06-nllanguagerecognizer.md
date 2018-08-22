@@ -5,62 +5,38 @@ translator: 김필권
 category: Cocoa
 tags: language
 excerpt: >
-    Machine learning has been at the heart of
-    natural language processing in Apple platforms for many years,
-    but it's only recently that external developers have been able to
-    harness it directly.
+    머신 러닝은 애플 플랫폼에서 오랜 시간동안 자연어 처리의 심장이었습니다. 하지만 외부 개발자들이 직접 접근할 수 있게 된 것은 최근의 일입니다.
 status:
     swift: 4.2
 ---
 
-One of my favorite activities, when I travel, is to listen to people as they pass and try to guess what language they're speaking.
+제가 여행할 때 가장 좋아하는 활동 중 하나는 사람들이 말하는 것을 듣고 그들이 어떤 언어를 말하고 있는지 추측하는 것입니다. 지난 몇 년간의 경험으로 저는 꽤 훌륭한 능력을 가지게 된 것 같습니다. (비록 제가 맞는지 확인하는 경우는 드물지만요)
 
-I'd like to think that I've gotten pretty good at it over the years (though I rarely get to know if I guessed right).
+운이 좋으면 저는 단어나 문장을 제가 잘 아는 언어와 비슷하게 알아들을 때도 있습니다. 그렇지 않으면 어떤 종류의 소리인지 듣고 음성 인벤토리를 구축하려고 노력합니다.
 
+예를 들면 치경음을 발음하기 위해서 [`⟨r⟩`](https://en.wikipedia.org/wiki/Dental,_alveolar_and_postalveolar_trills)를 쓸까요? 아니면 [`⟨ɾ⟩`](https://en.wikipedia.org/wiki/Flap_consonant)를 쓸까요? 아니면 [`⟨ɹ⟩`](https://en.wikipedia.org/wiki/Alveolar_and_postalveolar_approximants)를 쓸까요?
 
-If I'm lucky, I'll recognize a word or phrase as a cognate of a language I'm familiar with, and narrow things down from there.
+모음들은 대부분 열릴까요 닫힐까요? 아니면 앞쪽에서 발음할까요 아니면 뒤쪽에서 발음할까요? 아니면 [`⟨ʇ⟩`](https://en.wikipedia.org/wiki/Dental_clicks)와 같은 비정상적인 소리일까요?
 
-Otherwise, I try to build up a phonetic inventory, listening for what kinds of sounds are present.
+이것은 제가 생각하고 있는 내용입니다. 솔직히 말하자면 이 모든 일들은 언어의 인식 엄무를 위해서 무의식적으로 그리고 자동으로 일어납니다. 그리고 입력에서 출력까지에서 희미한 아이디어를 어떻게 얻는지 정도만 알려줍니다.
 
-For instance, is the speaker mostly using voiced alveolar trills [`⟨r⟩`](https://en.wikipedia.org/wiki/Dental,_alveolar_and_postalveolar_trills), flaps [`⟨ɾ⟩`](https://en.wikipedia.org/wiki/Flap_consonant), or postalveolar approximants [`⟨ɹ⟩`](https://en.wikipedia.org/wiki/Alveolar_and_postalveolar_approximants)?
+컴퓨터 연산도 비슷한 방식으로 작업됩니다. 오랜 기간의 훈련 이후에 머신 러닝 모델은 정형화된 탑다운 접근법에서 이전의 시도를 훨씬 넘어서는 텍스트의 언어 예측이 가능해졌습니다.
 
-Are the vowels mostly open / close; front / back?
-
-Any unusual sounds, like [`⟨ʇ⟩`](https://en.wikipedia.org/wiki/Dental_clicks)?
-
-
-...or at least that's what I think I do.
-
-To be honest, all of this happens unconsciously and automatically -- for all of us, and for all manner of language recognition tasks.
-
-And have only the faintest idea of how we get from input to output.
-
-
-Computers operate in a similar manner.
-
-After many hours of training, machine learning models can predict the language of text with accuracy far exceeding previous attempts from a formalized top-down approach.
-
-
-Machine learning has been at the heart of natural language processing in Apple platforms for many years, but it's only recently that external developers have been able to harness it directly.
+머신 러닝은 애플 플랫폼에서 오랜 시간동안 자연어 처리의 심장이었습니다. 하지만 외부 개발자들이 직접 접근할 수 있게 된 것은 최근의 일입니다.
 
 ---
 
+새로나올 iOS 12와 macOS 10.4부터 자연어 프레임워크([Natural Language framework](https://developer.apple.com/documentation/naturallanguage))가 기존의 언어 API를 재정의하고 개발자들에게 새로운 기능을 제공합니다.
 
-New in iOS 12 and macOS 10.14, the [Natural Language framework](https://developer.apple.com/documentation/naturallanguage) refines existing linguistic APIs and exposes new functionality to developers.
+[`NLTagger`](https://developer.apple.com/documentation/naturallanguage/nltagger)는 [`NSLinguisticTagger`](https://nshipster.com/nslinguistictagger/)에 새로운 사고방식이 접목된 버전입니다.
 
+[`NLTokenizer`](https://developer.apple.com/documentation/naturallanguage/nltokenizer)는 [`enumerateSubstrings(in:options:using:)`](https://developer.apple.com/documentation/foundation/nsstring/1416774-enumeratesubstrings) ([`CFStringTokenizer`](https://developer.apple.com/documentation/corefoundation/cfstringtokenizer-rf8))를 대체하게 될 것입니다.
 
-[`NLTagger`](https://developer.apple.com/documentation/naturallanguage/nltagger) is [`NSLinguisticTagger`](https://nshipster.com/nslinguistictagger/) with a new attitude.
+[`NLLanguageRecognizer`](https://developer.apple.com/documentation/naturallanguage/nllanguagerecognizer)는 `NSLinguisticTagger`에서 `dominantLanguage`를 통해 제공되던 기능의 익스텐션을 제공하고 추가적인 예측과 힌트를 제공할 수 있는 기능도 포함돼있습니다.
 
-[`NLTokenizer`](https://developer.apple.com/documentation/naturallanguage/nltokenizer) is a replacement for [`enumerateSubstrings(in:options:using:)`](https://developer.apple.com/documentation/foundation/nsstring/1416774-enumeratesubstrings) (neé [`CFStringTokenizer`](https://developer.apple.com/documentation/corefoundation/cfstringtokenizer-rf8)).
+## 자연어 텍스트의 언어 인식하기
 
-[`NLLanguageRecognizer`](https://developer.apple.com/documentation/naturallanguage/nllanguagerecognizer) offers an extension of the functionality previously exposted through the `dominantLanguage` in `NSLinguisticTagger`, with the ability to provide hints and get additional predictions.
-
-
-## Recognizing the Language of Natural Language Text
-
-
-Here's how to use `NLLanguageRecognizer` to guess the dominant language of natural language text:
-
+다음은 `NLLanguageRecognizer`가 자연어 텍스트의 가장 확률이 높은 언어를 추측하는 방법입니다.
 
 ```swift
 import NaturalLanguage
@@ -69,46 +45,31 @@ let string = """
 私はガラスを食べられます。それは私を傷つけません。
 """
 
-
 let recognizer = NLLanguageRecognizer()
 recognizer.processString(string)
 recognizer.dominantLanguage // ja
 ```
 
+먼저 `NLLanguageRecognizer` 인스턴스를 만들고 `processString(_:)` 메소드에 스트링을 전달합니다. 여기서 `dominantLanguage` 속성은 예상되는 언어의 BCP-47 언어 태그가 달린 `NLLanguage` 객체를 반환합니다. (예를 들어 일본어(日本語 / Japanese)의 경우엔 `"ja"`를 반환합니다)
 
-First, create an instance of `NLLanguageRecognizer` and call the method `processString(_:)` passing a string.
+### 다중 언어 추측하기
 
-From there, the `dominantLanguage` property returns an `NLLanguage` object containing the BCP-47 language tag of the predicted language (for example `"ja"` for 日本語 / Japanese).
+여러분이 대학에서 언어학을 배우셨거나 고등학교때 라틴 클럽에 참여하셨었다면 변증법적인 라틴어와 현대 이탈리아어 사이의 _다중 언어간의 동음 이의어_ 에 대한 예제를 많이 보셨을 것입니다.
 
-
-### Getting Multiple Language Hypotheses
-
-
-If you studied linguistics in college or joined the Latin club in high school, you may be familiar with some fun examples of _polylingual homonymy_ between dialectic Latin and modern Italian.
-
-
-For example, consider the readings of the following sentence:
-
+다음과 같은 문장으로 예를 들어보겠습니다.
 
 > CANE NERO MAGNA BELLA PERSICA!
-
 
 | Language | Translation                           |
 | -------- | ------------------------------------- |
 | Latin    | Sing, o Nero, the great Persian wars! |
 | Italian  | The black dog eats a nice peach!      |
 
+[Max Fisher](<https://en.wikipedia.org/wiki/Rushmore_(film)>)에게는 유감이지만 라틴어는 `NLLanguageRecognizer`가 지원하는 언어가 아닙니다. 따라서 이러한 혼란스러운 언어의 예는 거의 재미있지는 않을것입니다.
 
-To the chagrin of [Max Fisher](<https://en.wikipedia.org/wiki/Rushmore_(film)>), Latin isn't one of the languages supported by `NLLanguageRecognizer`, so any examples of confusable languages won't be nearly as entertaining.
+몇 가지 실험을 해보면 여러분은 `NLLanguageRecognizer`이 부정확한 결과를 내도록 하는 것이 어렵고 심지어 낮은 정확성을 보이는 경우도 적다는 것을 알게 될 것입니다. 하나의 어원을 가진 언어 가족간에 공유되는 것 외에도 각자의 단어도 95%의 확신을 얻게 되는 경우가 많습니다.
 
-
-With some experimentation, you'll find that it's quite difficult to get `NLLanguageRecognizer` to guess incorrectly, or even with low precision.
-
-Beyond giving it a single cognate shared across members of a language family, it's often able to get past 2σ to 95% certainty with a handful of words.
-
-
-After some trial and error, we were finally able to get `NLLanguageRecognizer` to guess incorrectly for a string of non-trivial length by passing the [Article I of the Universal Declaration of Human Rights in Norsk, Bokmål](https://www.ohchr.org/EN/UDHR/Pages/Language.aspx?LangID=nrr):
-
+몇몇 시도와 에러 이후에 `NLLanguageRecognizer`에 [노르웨이의 부크몰 언어로 된 세계 인권 선언 중 첫 번째 챕터](https://www.ohchr.org/EN/UDHR/Pages/Language.aspx?LangID=nrr)의 꽤 긴 길이의 문자열을 전달하면 부정확한 추측을 하게 된다는 사실을 알아냈습니다.
 
 ```swift
 let string = """
@@ -121,40 +82,27 @@ languageRecognizer.processString(string)
 recognizer.dominantLanguage // da (!)
 ```
 
+> [세계 인권 선언](http://www.un.org/en/universal-declaration-human-rights/)은 전 세계 500개 이상의 언어로 번역된 가장 널리 알려진 문서입니다.
+> 이러한 이유로 이 내용은 자연어 처리에 종종 쓰이곤 합니다.
 
-> The [Universal Declaration of Human Rights](http://www.un.org/en/universal-declaration-human-rights/), is the among the most widely-translated documents in the world, with translations in over 500 different languages.
+덴마크어와 노르웨이의 부크몰은 시작하는 부분이 매우 비슷하게 생겼기 때문에 `NLLanguageRecognizer`가 제대로 추측하지 못하는 것은 놀랍지 않은 일입니다. (비교를 위해 같은 내용을 [덴마크어로](https://www.ohchr.org/EN/UDHR/Pages/Language.aspx?LangID=dns) 준비했습니다.)
 
-> For this reason, it's often used for natural language tasks.
-
-
-Danish and Norwegian Bokmål are very similar languages to begin with, so it's unsurprising that `NLLanguageRecognizer` guessed incorrectly.
-
-(For comparison, here's the [equivalent text in Danish](https://www.ohchr.org/EN/UDHR/Pages/Language.aspx?LangID=dns))
-
-
-We can use the `languageHypotheses(withMaximum:)` method to get a sense of how confident the `dominantLanguage` guess was:
-
+`dominantLanguage`가 추측하는 언어가 얼마나 자신감 있는지는 `languageHypotheses(withMaximum:)` 메소드를 사용해서 확인할 수 있습니다.
 
 ```swift
 languageRecognizer.languageHypotheses(withMaximum: 2)
 ```
-
 
 | Language                | Confidence |
 | ----------------------- | ---------- |
 | Danish (`da`)           | 56%        |
 | Norwegian Bokmål (`nb`) | 43%        |
 
-
-At the time of writing, the [`languageHints`](https://developer.apple.com/documentation/naturallanguage/nllanguagerecognizer/3017455-languagehints) property is undocumented, so it's unclear how exactly it should be used.
-
-However, passing a weighted dictionary of probabilities seems to have the desired effect of bolstering the hypotheses with known priors:
-
+글을 쓰고 있는 시점에는 [`languageHints`](https://developer.apple.com/documentation/naturallanguage/nllanguagerecognizer/3017455-languagehints) 속성이 문서화되지 않아서 어떤 방식으로 쓰이는지 확실하지 않습니다. 하지만 가중치가 적힌 사전을 전달한다면 가설을 강화하는 바람직한 효과를 갖는 것으로 보입니다.
 
 ```swift
 languageRecognizer.languageHints = [.danish: 0.25, .norwegian: 0.75]
 ```
-
 
 | Language                | Confidence (with Hints) |
 | ----------------------- | ----------------------- |
@@ -163,21 +111,15 @@ languageRecognizer.languageHints = [.danish: 0.25, .norwegian: 0.75]
 
 <br/>
 
+그렇다면 문자열의 언어를 알면 무엇을 할 수 있을까요?
 
-So what can you do once you know the language of a string?
+그래서 생각해볼만한 경우를 준비해왔습니다.
 
+## 철자가 틀린 단어 검사할 때
 
-Here are a couple of use cases for your consideration:
+`NLLanguageRecognizer`와 [`UITextChecker`](https://nshipster.com/uitextchecker/)를 조합하면 아무 문자열의 단어의 철자를 검사할 수 있습니다.
 
-
-## Checking Misspelled Words
-
-
-Combine `NLLanguageRecognizer` with [`UITextChecker`](https://nshipster.com/uitextchecker/) to check the spelling of words in any string:
-
-
-Start by creating an `NLLanguageRecognizer` and initializing it with a string by calling the `processString(_:)` method:
-
+`NLLanguageRecognizer`를 만들고 `processString(_:)` 메소드로 초기화하는 것으로 시작합니다.
 
 ```swift
 let string = """
@@ -190,9 +132,7 @@ languageRecognizer.processString(string)
 let dominantLanguage = languageRecognizer.dominantLanguage! // de
 ```
 
-
-Then, pass the `rawValue` of the `NLLanguage` object returned by the `dominantLanguage` property to the `language` parameter of `rangeOfMisspelledWord(in:range:startingAt:wrap:language:)`:
-
+그 다음엔 `rangeOfMisspelledWord(in:range:startingAt:wrap:language:)`의 파라미터인 `language`의 속성인 `dominantLanguage`에서 반환되는 `NLLanguage` 객체의 `rawValue`를 전달합니다.
 
 ```swift
 let textChecker = UITextChecker()
@@ -218,9 +158,7 @@ repeat {
 } while true
 ```
 
-
-When passed the [The Funniest Joke in the World](https://en.wikipedia.org/wiki/The_Funniest_Joke_in_the_World), the following words are called out for being misspelled:
-
+[세상에서 가장 웃긴 농담](https://en.wikipedia.org/wiki/The_Funniest_Joke_in_the_World)을 전달해보면 다음의 언어들이 철자가 잘못됐다고 나올 것입니다.
 
 - Nunstück
 - Slotermeyer
@@ -228,12 +166,9 @@ When passed the [The Funniest Joke in the World](https://en.wikipedia.org/wiki/T
 - Flipperwaldt
 - gersput
 
+## 연설 합치기
 
-## Synthesizing Speech
-
-
-You can use `NLLanguageRecognizer` in concert with [`AVSpeechSynthesizer`](https://nshipster.com/avspeechsynthesizer/) to hear any natural language text read aloud:
-
+`NLLanguageRecognizer`와 [`AVSpeechSynthesizer`](https://nshipster.com/avspeechsynthesizer/)를 콘서트에 사용하면 자연어 텍스트를 크게 들을 수도 있습니다.
 
 ```swift
 let string = """
@@ -253,17 +188,10 @@ utterance.voice = AVSpeechSynthesisVoice(language: language)
 speechSynthesizer.speak(utterance)
 ```
 
-
-It doesn't have the lyrical finesse of [Joe Dassin](https://itunes.apple.com/us/album/les-champs-%C3%A9lys%C3%A9es/311331439?i=311331447), but _ainsi va la vie_.
+[Joe Dassin](https://itunes.apple.com/us/album/les-champs-%C3%A9lys%C3%A9es/311331439?i=311331447)의 서정적인 기교를 가지고 있지는 않지만 _인생도 그렇지 않습니까_.
 
 ---
 
+이해되기 위해서는 우리가 먼저 이해해야 합니다. 그리고 자연어를 이해하기 위한 첫 번째 단계는 언어를 결정하는 것입니다.
 
-In order to be understood, we first must seek to understand.
-
-And the first step to understanding natural language is to determine its language.
-
-
-`NLLanguageRecognizer` offers a powerful new interface to functionality that's been responsible for intelligent features throughout iOS and macOS.
-
-See how you might take advantage of it in your app to gain new understanding of your users.
+`NLLanguageRecognizer`는 iOS와 macOS 전반에 걸친 지능형 특징을 담당하는 기능에 대한 강력한 새로운 인터페이스를 제공합니다. 사용자에 대한 새로운 이해를 얻기 위해 `NLLanguageRecognizer`을 여러분의 앱에 적용해보세요.
