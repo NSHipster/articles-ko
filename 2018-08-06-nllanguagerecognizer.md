@@ -10,15 +10,15 @@ status:
     swift: 4.2
 ---
 
-제가 여행할 때 가장 좋아하는 활동 중 하나는 사람들이 말하는 것을 듣고 그들이 어떤 언어를 말하고 있는지 추측하는 것입니다. 지난 몇 년간의 경험으로 저는 꽤 훌륭한 능력을 가지게 된 것 같습니다. (비록 제가 맞는지 확인하는 경우는 드물지만요)
+제가 여행할 때 가장 좋아하는 활동 중 하나는 사람들이 말하는 것을 듣고 그들이 어떤 언어를 말하고 있는지 추측하는 것입니다. 지난 몇 년간의 경험으로 저는 꽤 쓸만한 능력을 가지게 된 것 같습니다. (비록 제가 맞는지 확인하는 경우는 드물지만요)
 
 운이 좋으면 저는 단어나 문장을 제가 잘 아는 언어와 비슷하게 알아들을 때도 있습니다. 그렇지 않으면 어떤 종류의 소리인지 듣고 음성 인벤토리를 구축하려고 노력합니다.
 
-예를 들면 치경음을 발음하기 위해서 [`⟨r⟩`](https://en.wikipedia.org/wiki/Dental,_alveolar_and_postalveolar_trills)를 쓸까요? 아니면 [`⟨ɾ⟩`](https://en.wikipedia.org/wiki/Flap_consonant)를 쓸까요? 아니면 [`⟨ɹ⟩`](https://en.wikipedia.org/wiki/Alveolar_and_postalveolar_approximants)를 쓸까요?
+예를 들면 치경음을 발음하기 위해서 [`⟨r⟩`](https://en.wikipedia.org/wiki/Dental,_alveolar_and_postalveolar_trills)를 쓸지 아니면 [`⟨ɾ⟩`](https://en.wikipedia.org/wiki/Flap_consonant)를 쓸지 아니면 [`⟨ɹ⟩`](https://en.wikipedia.org/wiki/Alveolar_and_postalveolar_approximants)를 쓰는지 생각하는 것처럼요.
 
-모음들은 대부분 열릴까요 닫힐까요? 아니면 앞쪽에서 발음할까요 아니면 뒤쪽에서 발음할까요? 아니면 [`⟨ʇ⟩`](https://en.wikipedia.org/wiki/Dental_clicks)와 같은 비정상적인 소리일까요?
+모음들은 대부분 열린 모양일까요 닫힌 모양일까요? 아니면 앞쪽에서 발음할까요 뒤쪽에서 발음할까요? 아니면 [`⟨ʇ⟩`](https://en.wikipedia.org/wiki/Dental_clicks)와 같은 비정상적인 소리일까요?
 
-이것은 제가 생각하고 있는 내용입니다. 솔직히 말하자면 이 모든 일들은 언어의 인식 엄무를 위해서 무의식적으로 그리고 자동으로 일어납니다. 그리고 입력에서 출력까지에서 희미한 아이디어를 어떻게 얻는지 정도만 알려줍니다.
+솔직히 말하자면 이 모든 일들은 언어의 인식 엄무를 위해서 무의식적으로 그리고 자동으로 일어납니다. 그리고 입력에서 출력까지에서 희미한 아이디어를 어떻게 얻는지 정도만 알려줍니다.
 
 컴퓨터 연산도 비슷한 방식으로 작업됩니다. 오랜 기간의 훈련 이후에 머신 러닝 모델은 정형화된 탑다운 접근법에서 이전의 시도를 훨씬 넘어서는 텍스트의 언어 예측이 가능해졌습니다.
 
@@ -188,10 +188,10 @@ utterance.voice = AVSpeechSynthesisVoice(language: language)
 speechSynthesizer.speak(utterance)
 ```
 
-[Joe Dassin](https://itunes.apple.com/us/album/les-champs-%C3%A9lys%C3%A9es/311331439?i=311331447)의 서정적인 기교를 가지고 있지는 않지만 _인생도 그렇지 않습니까_.
+[Joe Dassin](https://itunes.apple.com/us/album/les-champs-%C3%A9lys%C3%A9es/311331439?i=311331447)의 서정적인 기교를 가지고 있지는 않지만 _ainsi va la vie_.
 
 ---
 
-이해되기 위해서는 우리가 먼저 이해해야 합니다. 그리고 자연어를 이해하기 위한 첫 번째 단계는 언어를 결정하는 것입니다.
+이해받기 위해서는 우리가 먼저 이해해야 합니다. 그리고 자연어를 이해시키기 위한 첫 단계는 언어를 결정하는 것입니다.
 
-`NLLanguageRecognizer`는 iOS와 macOS 전반에 걸친 지능형 특징을 담당하는 기능에 대한 강력한 새로운 인터페이스를 제공합니다. 사용자에 대한 새로운 이해를 얻기 위해 `NLLanguageRecognizer`을 여러분의 앱에 적용해보세요.
+`NLLanguageRecognizer`는 iOS와 macOS 전반에 걸친 지능형 특징을 담당하는 기능에 대한 강력한 새로운 인터페이스를 제공합니다. 여러분의 앱에 적용해보시고 사용자에 대한 새로운 이해를 얻으세요!
