@@ -13,28 +13,17 @@ status:
   swift: 4.2
 ---
 
+1911년, 언어학자인 [Franz Boas](https://en.wikipedia.org/wiki/Franz_Boas)는 [에스키모-알류트 언어](https://en.wikipedia.org/wiki/Eskimo–Aleut_languages)를 사용하는 사람들이 땅 위에 있는 눈과 떨어지고 있는 눈송이를 구별하기 위해 다른 단어를 사용한다는 사실을 알았습니다. 반대로 영어를 사용하는 사람들은 보통 그 둘을 모두 "snow"라고 부르지만 빗방울과 웅덩이를 구별하는 언어를 만들었습니다.
 
-In 1911, linguist [Franz Boas](https://en.wikipedia.org/wiki/Franz_Boas) observed that speakers of [Eskimo–Aleut languages](https://en.wikipedia.org/wiki/Eskimo–Aleut_languages) used different words to distinguish falling snowflakes from snow on the ground.
+시간이 지나서 이 간단한 경험적인 관찰은 다음과 같은 끔찍하고 진부한 표현으로 변형되었습니다. "에스키모들은 눈을 표현하는 50가지 다른 단어를 사용한다." 불행히도 Boas의 관찰은 경험에 의거한 것이었고 결과로 나온 다음의 언어 상대성에 대한 약한 주장은 논란의 여지가 없습니다 : 언어는 의미적 개념을 서로 다른 방식으로 독립적인 단어로 나눕니다. 그것이 역사적인 사고였거나 문화에 대한 더 깊은 진실을 반영한 것인지는 불분명합니다. 이것은 추가 토론을 위한 주제가 될 것입니다.
 
-By comparison, English speakers typically refer to both as "snow," but create a similar distinction between raindrops and puddles.
-
-
-Over time, this simple empirical observation has warped into an awful cliché that "Eskimos [sic] have 50 different words for snow" --- which is unfortunate, because Boas' original observation was empirical, and the resulting weak claim of linguistic relativity is uncontroversial: languages divide semantic concepts into separate words in ways that may (and often do) differ from one another.
-
-Whether that's more an accident of history or reflective of some deeper truth about a culture is unclear, and subject for further debate.
-
-
-It's in this framing that you're invited to consider how the different kinds of literals in Swift shape the way we reason about code.
-
+오늘은 이 틀에서 Swift의 다양한 리터럴들이 어떻게 우리가 코드에 대해 생각하는 방식을 형성하는지 생각할 수 있을 것입니다.
 
 ---
 
+<dfn>리터럴</dfn>은 넘버나 스트링같이 소스 코드의 값을 대표하는 것입니다.
 
-A <dfn>literal</dfn> is a representation of a value in source code, such as a number or a string.
-
-
-Swift provides the following kinds of literals:
-
+Swift는 다음과 같은 종류의 리터럴을 제공합니다.
 
 | Name                      | Default Inferred Type | Examples                          |
 | ------------------------- | --------------------- | --------------------------------- |
@@ -48,39 +37,25 @@ Swift provides the following kinds of literals:
 | Array                     | `Array`               | `[1, 2, 3]`                       |
 | Dictionary                | `Dictionary`          | `["a": 1, "b": 2]`                |
 
+Swift의 리터럴을 이해하는데 가장 중요한 것은 그것들이 절대적인 타입이 아닌 값을 대표한다는 것입니다.
 
-The most important thing to understand about literals in Swift is that they specify a value, but not a definite type.
+컴파일러가 리터럴을 만나면 자동으로 타입으로 추론하려고 합니다. 컴파일러는 그 리터럴 종류로 초기화할 수 있는 모든 타입을 찾아보고 다른 제약조건을 추가하면서 좁혀갑니다.
 
-
-When the compiler encounters a literal, it attempts to infer the type automatically.
-
-It does this by looking for each type that could be initialized by that kind of literal, and narrowing it down based on any other constraints.
-
-
-If no type can be inferred, Swift initializes the default type for that kind of literal --- `Int` for an integer literal, `String` for a string literal, and so on.
-
+어떤 타입도 추론되지 않으면 Swift는 그 리터럴 종류에 대한 디폴트 타입을 초기화합니다. `Int`는 정수 리터럴, `String`은 스트링 리터럴처럼요.
 
 ```swift
 57 // Integer literal
 "Hello" // String literal
 ```
 
-
-In the case of `nil` literals, the type can never be inferred automatically and therefore must be declared.
-
+`nil` 리터럴의 경우엔 절대 자동으로 타입을 추론할 수 없기때문에 정의해주어야 합니다.
 
 ```swift
 nil // ! cannot infer type
 nil as String? // Optional<String>.none
 ```
 
-
-For array and dictionary literals, the associated types for the collection are inferred based on its contents.
-
-However, inferring types for large or nested collections is a complex operation and may significantly increase the amount of time it takes to compile your code.
-
-You can keep things snappy by adding an explicit type in your declaration.
-
+배열과 딕셔너리 리터럴은 컬렉션에 연관된 타입들이 그것의 컨텐츠에 기반해서 추론됩니다. 그러나 크기가 크거나 중첩된 컬렉션의 타입을 추론하는 것은 복잡한 연산이고 여러분의 코드를 컴파일하는 총 시간을 엄청나게 증가시킬 것입니다. 정의에 분명한 타입을 추가하면 산뜻하게 유지할 수 있습니다.
 
 ```swift
 // Explicit type in the declaration
@@ -93,12 +68,9 @@ let dictionary: [String: [Int]] = [
 ]
 ```
 
+### 플레이그라운드 리터럴
 
-### Playground Literals
-
-
-In addition to the standard literals listed above, there are a few additional literal types for code in Playgrounds:
-
+위에 나열된 표준 리터럴 외에도 플레이그라운드에서 코드에 대한 몇 가지 추가 리러털 유형이 있습니다.
 
 | Name  | Default Inferred Type | Examples                                             |
 | ----- | --------------------- | ---------------------------------------------------- |
@@ -106,9 +78,7 @@ In addition to the standard literals listed above, there are a few additional li
 | Image | `NSImage` / `UIImage` | `#imageLiteral(resourceName: "icon")`                |
 | File  | `URL`                 | `#fileLiteral(resourceName: "articles.json")`        |
 
-
-In Xcode or Swift Playgrounds on the iPad, these octothorpe-prefixed literal expressions are automatically replaced by an interactive control that provides a visual representation of the referenced color, image, or file.
-
+Xcode나 iPad의 Swift 플레이그라운드에서 이 # 접두사 리터럴 표현식은 참조된 색상, 이미지 또는 파일의 시각적 표현을 제공하는 상호작용 컨트롤로 자동 대체됩니다.
 
 ```swift
 // Code
@@ -118,16 +88,13 @@ In Xcode or Swift Playgrounds on the iPad, these octothorpe-prefixed literal exp
 🏽
 ```
 
-
 {% asset color-literal-picker.png %}
 
-
-This control also makes it easy for new values to be chosen: instead of entering RGBA values or file paths, you're presented with a color picker or file selector.
+이 컨트롤은 새로운 값을 고를 경우도 편하게 만들어줍니다. RGBA 값이나 파일 주소를 입력하는 것 대신에 컬러 픽커와 파일 선택창을 제공해줍니다.
 
 ---
 
-
-Most programming languages have literals for Boolean values, numbers, and strings, and many have literals for arrays, dictionaries, and regular expressions.
+대부분의 프로그래밍 언어가 Boolean, 숫자, 스트링에 대한 리터럴을 가지고 있고, 배열, 딕셔너리 그리고 정규 표현식에 대한 리터럴도 많이 가지고 있습니다.
 
 
 Literals are so ingrained in a developer's mental model of programming that most of us don't actively consider what the compiler is actually doing.
