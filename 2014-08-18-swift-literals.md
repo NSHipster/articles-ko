@@ -21,7 +21,7 @@ status:
 
 Swift는 다음과 같은 종류의 리터럴을 제공합니다.
 
-| Name                      | Default Inferred Type | Examples                          |
+| 이름                      | 기본 추론 타입 | 예제                          |
 | ------------------------- | --------------------- | --------------------------------- |
 | Integer                   | `Int`                 | `123`, `0b1010`, `0o644`, `0xFF`, |
 | Floating-Point            | `Double`              | `3.14`, `6.02e23`, `0xAp-2`       |
@@ -54,8 +54,7 @@ nil as String? // Optional<String>.none
 배열과 딕셔너리 리터럴은 컬렉션에 연관된 타입들이 그것의 컨텐츠에 기반해서 추론됩니다. 그러나 크기가 크거나 중첩된 컬렉션의 타입을 추론하는 것은 복잡한 연산이고 여러분의 코드를 컴파일하는 총 시간을 엄청나게 증가시킬 것입니다. 정의에 분명한 타입을 추가하면 산뜻하게 유지할 수 있습니다.
 
 ```swift
-// Explicit type in the declaration
-// prevents expensive type inference during compilation
+// 정의할 때 타입을 명백하게 지정하는 것은 컴파일 시에 타입 추론을 방지해줍니다
 let dictionary: [String: [Int]] = [
     "a": [1, 2],
     "b": [3, 4],
@@ -68,7 +67,7 @@ let dictionary: [String: [Int]] = [
 
 위에 나열된 표준 리터럴 외에도 플레이그라운드에서 코드에 대한 몇 가지 추가 리러털 유형이 있습니다.
 
-| Name  | Default Inferred Type | Examples                                             |
+| 이름  | 기본 추론 타입 | 예제                                             |
 | ----- | --------------------- | ---------------------------------------------------- |
 | Color | `NSColor` / `UIColor` | `#colorLiteral(red: 1, green: 0, blue: 1, alpha: 1)` |
 | Image | `NSImage` / `UIImage` | `#imageLiteral(resourceName: "icon")`                |
@@ -77,10 +76,10 @@ let dictionary: [String: [Int]] = [
 Xcode나 iPad의 Swift 플레이그라운드에서 이 # 접두사 리터럴 표현식은 참조된 색상, 이미지 또는 파일의 시각적 표현을 제공하는 상호작용 컨트롤로 자동 대체됩니다.
 
 ```swift
-// Code
+// 코드
 #colorLiteral(red: 0.7477839589, green: 0.5598286986, blue: 0.4095913172, alpha: 1)
 
-// Rendering
+// 렌더링 결과
 🏽
 ```
 
@@ -112,7 +111,7 @@ _어떻게 이렇게 작동하는거죠?_
 
 Swift에선 컴파일러가 <dfn>리터럴 표현 프로토콜</dfn>에 대응하게 구현된 타입들을 보며 리터럴을 어떻게 초기화할지 결정합니다.
 
-| Literal                   | Protocol                                      |
+| 리터                       | 프로토콜                                        |
 | ------------------------- | --------------------------------------------- |
 | Integer                   | `ExpressibleByIntegerLiteral`                 |
 | Floating-Point            | `ExpressibleByFloatLiteral`                   |
@@ -132,7 +131,7 @@ Swift에선 컴파일러가 <dfn>리터럴 표현 프로토콜</dfn>에 대응�
 
 적절한 경우에 리터럴로 초기화를 지원하면 커스텀 타입의 인체 공학을 향상시켜주고 내장돼있는 것과 같은 기분을 느끼게 해줍니다.
 
-예를 들어 [fuzzy logic](https://en.wikipedia.org/wiki/Fuzzy_logic)을 지원하고 싶으면 다음과 같이 `Fuzzy` 타입을 구현해야 할 것입니다.
+예를 들어 [fuzzy logic](https://en.wikipedia.org/wiki/Fuzzy_logic)을 지원하고 싶으면 다음과 같이 `Fuzzy` 타입을 구현해야합니다.
 
 ```swift
 struct Fuzzy: Equatable {
@@ -160,11 +159,7 @@ extension Fuzzy: ExpressibleByBooleanLiteral {
 > 실제로 Boolean 리터럴을 사용해서 타입을 초기화해야하는 경우는 많지 않습니다.
 > 스트링, 정수 그리고 부동 소수점 리터럴이 더 보통의 경우입니다.
 
-이렇게 하는 것이 `true`와 `false`의 기본적인 의미를 해치는 것은 아닙니다.
-Doing so doesn't change the default meaning of `true` or `false`.
-우리가 소개한 반-진실 개념이 기존의 코드를 부술 걱정은 하지 않아도 됩니다.
-We don't have to worry about existing code breaking just because we introduced the concept of half-truths to our code base ("_view did appear animated... maybe?_").
-`true` 또는 `false`가 `Fuzzy` 값을 초기화하는 유일한 상황은 컴파일러가 그 타입을 `Fuzzy` 라고 추론할 때만 입니다.
+이렇게 하는 것이 `true`와 `false`의 기본적인 의미를 해치는 것은 아닙니다. 우리가 소개한 반-진실 개념이 기존의 코드를 부술 걱정은 하지 않아도 됩니다. `true` 또는 `false`가 `Fuzzy` 값을 초기화하는 유일한 상황은 컴파일러가 그 타입을 `Fuzzy` 라고 추론할 때만 입니다.
 
 ```swift
 true is Bool // true
@@ -174,9 +169,7 @@ true is Fuzzy // false
 (false as Fuzzy).value // 0.0
 ```
 
-`Fuzzy` 는 하나의 `Double` 값으로 초기화하기 때문에 부동 소수점 리터럴을 사용해서도 값을 초기화할 수 있습니다.
-Because `Fuzzy` is initialized with a single `Double` value, it's reasonable to allow values to be initialized with floating-point literals as well.
-부동 소수점은 지원하지만 정수를 지원하지 않는 타입을 생각하는 것은 어렵습니다. 그러니 정수도 지원하도록 만들어보겠습니다. (하지만 그 반대는 참이 아닙니다. 정수는 지원하는데 부동 소수점을 지원하지 않는 경우는 정말 많습니다.)
+`Fuzzy` 는 하나의 `Double` 값으로 초기화하기 때문에 부동 소수점 리터럴을 사용해서도 값을 초기화할 수 있습니다. 부동 소수점은 지원하지만 정수를 지원하지 않는 타입을 생각하는 것은 어렵습니다. 그러니 정수도 지원하도록 만들어보겠습니다. (하지만 그 반대는 참이 아닙니다. 정수는 지원하는데 부동 소수점을 지원하지 않는 경우는 정말 많습니다.)
 
 ```swift
 extension Fuzzy: ExpressibleByIntegerLiteral {
