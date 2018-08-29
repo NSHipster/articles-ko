@@ -8,17 +8,17 @@ status:
   swift: 4.2
 ---
 
-1930년대에 Rube Goldberg라는 이름은 누구나 알만한 이름이 되었고 ["자가 작동식 냅킨"](https://upload.wikimedia.org/wikipedia/commons/a/a9/Rube_Goldberg%27s_%22Self-Operating_Napkin%22_%28cropped%29.gif)처럼 환상적이게 복잡하며 만화에 그려질 것 같이 기발한 발명품을 뜻하는 말이었습니다. 같은 시간에 Albert Einstein은 Niels Bohr의 양자 기계의 우세한 이론에 대한 그의 [평론](https://en.wikipedia.org/wiki/EPR_paradox)에서 "양자 얽힘"이라는 단어를 유행하고 있었습니다.
+1930년대에 Goldberg라는 이름은 ["자가 작동식 냅킨"](https://upload.wikimedia.org/wikipedia/commons/a/a9/Rube_Goldberg%27s_%22Self-Operating_Napkin%22_%28cropped%29.gif)처럼 환상적이게 복잡하며 만화에 그려질 것 같이 기발한 발명품을 뜻하는 말이 되었습니다. 동시에 Albert Einstein은 양자 기계에서 우세한 Niels Bohr의 이론에 대한 그의 [평론](https://en.wikipedia.org/wiki/EPR_paradox)에서 "양자 얽힘"이라는 단어를 유행하고 있었습니다.
 
 몇 세기 후에 모던 소프트웨어 개발은 Goldberg 기계의 정수라고 할 수 있을 정도로 복잡해졌습니다.
 
-소프트웨어 개발자로서 가능하면 코드를 얽히지 않게 하는 것이 좋습니다. 이는 [Single Responsibility Principle](https://en.wikipedia.org/wiki/Single_responsibility_principle), [Principle of Least Astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment), 그리고 [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter)와 같이 인상적인 가이드라인으로 성문화되어 있습니다. 그러나 부작용을 생산하는 코드에 대한 의혹에도 불구하고 때로는 기술이 혼란스러운 것보다 명확해질 수 있는 기회가 존재합니다.
+코드는 가능하면 얽히지 않게 하는 것이 좋습니다. 이는 [Single Responsibility Principle](https://en.wikipedia.org/wiki/Single_responsibility_principle), [Principle of Least Astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment), 그리고 [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter)와 같이 인상적인 가이드라인으로 성문화되어 있습니다. 그러나 부작용을 생산하는 코드에 대한 의혹에도 불구하고 때로는 기술이 혼란스러운 것보다 명확해질 수 있는 기회가 존재합니다.
 
-그 중 하나가 이 주의 아티클의 주제인 Swift의 프로퍼티 옵저버입니다. 프로퍼티 옵저버는 모델-뷰-뷰모델(MVVM), 함수형 반응형 프로그래밍 (FRP) 같은 공식화된 해결책의 가볍고 내장된 대체재를 제공합니다.
+그 중 하나가 이 주의 아티클의 주제인 Swift의 프로퍼티 옵저버입니다. 프로퍼티 옵저버는 Swift에 내장돼있으며 모델-뷰-뷰모델(MVVM), 함수형 반응형 프로그래밍 (FRP) 같은 공식화된 해결책의 대체재를 제공합니다.
 
 ---
 
-Swift의 프로퍼티에는 두 가지 종류가 있습니다. 하나는 상태를 객체와 연결하는 <dfn>저장된 프로퍼티 (stored properties)</dfn>이고, 또 다른 하나는 그 상태에 기반해서 계산을 하는 <dfn>계산된 프로퍼티 (computed properties)</dfn> 입니다. 예를 들어 보겠습니다.
+Swift의 프로퍼티에는 두 가지 종류가 있습니다. 하나는 상태를 객체와 연결하는 <dfn>저장된 프로퍼티 (stored properties)</dfn>이고, 또 다른 하나는 그 상태에 기반해서 계산을 하는 <dfn>계산된 프로퍼티 (computed properties)</dfn> 입니다.
 
 ```swift
 struct S {
@@ -32,7 +32,7 @@ struct S {
 }
 ```
 
-저장된 프로퍼티를 선언했을 때는 <dfn>프로퍼티 옵저버</dfn>를 프로퍼티가 설정됐을 때 실행될 코드 블락과 함께 정의할 수 있는 선택지를 제공받습니다. `willSet` 옵저버는 새로운 값이 저장되기 전에 실행되고 `didSet` 옵저버는 이후에 실행됩니다. 그리고 그것들은 예전 값이 새로운 값과 같은지 여부에 상관없이 실행됩니다.
+저장된 프로퍼티를 선언했을 때는 <dfn>프로퍼티 옵저버</dfn>를 프로퍼티가 설정됐을 때 실행될 코드 블락과 함께 정의할 수 있는 선택지를 제공받습니다. `willSet` 옵저버는 새로운 값이 저장되기 전에 실행되고 `didSet` 옵저버는 이후에 실행되고 새로운 값이 예전 값과 같더라도 실행됩니다.
 
 ```swift
 struct S {
@@ -52,12 +52,12 @@ struct S {
 }
 ```
 
-예를 들어 다음과 같은 코드를 실행하면 그 아래와 같은 텍스트가 출력될 것입니다.
-
 ```swift
 var s = S(stored: "first")
 s.stored = "second"
 ```
+
+위의 코드는 아래와 같은 텍스트를 출력할 것입니다.
 
 - <samp>willSet이 호출되었습니다</samp>
 - <samp>stored가 지금은 first와 같습니다</samp>
@@ -67,15 +67,15 @@ s.stored = "second"
 - <samp>stored의 이전 값은 first 였습니다</samp>
 
 > 중요한 사실은 옵저버는 이니셜라이져에서 프로퍼티를 설정할 떄는 실행되지 않는다는 것입니다.
-> Swift 4.2에선 setter 호출을 `defer` 블록에서 작업할 수 있지만 [이것은 버그라서 곧 수정될 것입니다](https://twitter.com/jckarter/status/926459181661536256). 그러니 이러한 변화에는 따르지 않으셔도 됩니다.
+> Swift 4.2에선 `defer` 블록에서 setter를 호출할 수 있지만 [이것은 버그라서 곧 수정될 것입니다](https://twitter.com/jckarter/status/926459181661536256). 무시하셔도 됩니다.
 
 ---
 
-Swift 프로퍼티 옵저버는 언어의 아주 초기부터 일부분을 차지하고 있었습니다. 그 이유를 잘 이해하기 위해 Objective-C에선 어떻게 작동하는지 빠르게 둘러보겠습니다.
+프로퍼티 옵저버는 Swift 초기부터 언어의 한 부분을 차지하고 있었습니다. 그 이유를 이해하기 위해 Objective-C에선 어떻게 작동하는지 둘러보겠습니다.
 
 ## Objective-C에서의 프로퍼티
 
-Objective-C에선 모든 프로퍼티는 어떤 의미에서는 계산된 프로퍼티입니다. 마침표 노테이션을 통해 프로퍼티에 접근할 때마다 그 호출은 getter 또는 setter를 발동하도록 번역됩니다. 이는 인스턴스 변수를 읽거나 작성하는 함수를 실행하는 메세지로 컴파일됩니다.
+Objective-C의 프로퍼티는 어떤 의미에서 모두 계산된 프로퍼티입니다. 마침표 노테이션을 통해 프로퍼티에 접근할 때마다 그 호출은 getter 또는 setter를 발동하도록 번역됩니다. 그리고 인스턴스 변수를 읽거나 작성하는 함수를 실행하는 메세지로 컴파일됩니다.
 
 ```objc
 // 마침표 접근법
@@ -91,7 +91,7 @@ objc_msgSend(person, @selector(setName:), @"Johnny");
 person->_name = @"Johnny";
 ```
 
-부작용은 여러분이 보통 프로그래밍에서 피하고 싶은 무언가입니다. 왜냐하면 프로그램이 작동하는 방식을 추측하기 어렵게 만들기 때문입니다. 하지만 많은 Objective-C 개발자들이 필요에 따라 getter 또는 setter 메소드에 추가 행동을 주입하는 기능에 의존하게 되었습니다.
+이는 프로그램이 작동하는 방식을 추측하 어렵게 만들기 때문에 프로그래밍할 때 피하고 싶은 그런 것을 부작용이 일어납니다. 하지만 많은 Objective-C 개발자들이 필요에 따라 getter 또는 setter 메소드에 추가 행동을 주입할 수 있는 기능 때문에 이에 의존하게 되었습니다.
 
 프로퍼티에 대한 Swift의 디자인은 이러한 패턴을 공식화하고 상태 접근을 데코레이트하는 부작용(저장된 프로퍼티)과 상태 접근을 리다이렉트하는 부작용 사이의 차이(계산된 프로퍼티)를 만듭니다. 저장된 프로퍼티의 경우 `willSet` 과 `didSet` 옵저버는 ivar 접근과 함께 포함시키지 않을 코드를 대체합니다. 계산된 프로퍼티의 경우 `get` 과 `set` 접근자는 Objective-C에서 `@dynamic` 프로퍼티로 구현할 코드를 대체합니다.
 
@@ -108,7 +108,7 @@ person->_name = @"Johnny";
 
 때로는 타입에 허용되는 값의 추가적인 제한 조건을 넣고 싶을 때가 있습니다.
 
-예를 들면 만약 여러분이 정부 관료를 대하는 앱을 개발중이라면 여러분은 사용자가 문서에 필수 요소를 빼먹거나 유효하지 않은 값을 제출할 수 없도록 보증해야 할 수도 있습니다.
+만약 정부 관료를 대상으로 하는 앱을 개발중이라면 여러분은 사용자가 문서에 필수 요소를 빼먹거나 유효하지 않은 값을 제출할 수 없도록 확인해야 할 것입니다.
 
 예를 들어 문서 폼에 이름이 악센트 없이 대문자만 필요로 한다면 `didSet` 프로퍼티 옵저버를 사용해서 자동으로 발음 구별 부호를 벗겨내고 새로운 값을 대문자로 만들 수 있습니다.
 
@@ -212,6 +212,6 @@ _끝내주지 않나요?_
 
 ---
 
-일반적으로 부작용은 프로그래밍할 때 피하고 싶은 것들입니다. 왜냐하면 그들은 복잡항 행동에 대해 추측하기 어렵게 만들기 때문입니다. 다음 번에 이 새로운 도구를 사용할 때 꼭 기억하시길 바랍니다.
+일반적으로 그것들은 복잡한 행동을 추측하기 어렵게 만들기 때문에 프로그래밍할 때 피하고 싶은 부작용을 일으킵니다. 그러니 다음 번에 이 새로운 도구를 사용할 때 꼭 기억하시길 바랍니다.
 
-그럼에도 불구하고 이 추상화의 탑 꼭대기에서는 시스템의 혼란을 받아들이는 것이 유혹이 될 수도 있고 때로는 보람을 느낄 수도 있을 것입니다. 항상 규칙을 따르는 것은 아인슈타인이 아닌 보어스러운 것입니다.
+그럼에도 불구하고 이 추상화의 탑 꼭대기에서는 시스템의 혼란을 받아들이는 것이 유혹이 될 수도 있고 때로는 보람을 느낄 수도 있을 것입니다. 항상 규칙을 따르는 것은 아인슈타인이 아닌 보어(Bohr)스러운 것입니다.
