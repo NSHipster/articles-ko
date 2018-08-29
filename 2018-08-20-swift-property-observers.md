@@ -1,186 +1,116 @@
 ---
 title: Swift Property Observers
 author: Mattt
+translator: 김필권
 category: Swift
-excerpt: >
-  Modern software development has become what might be seen as
-  the quintessence of Goldbergian contraption.
-  Yet there are occasions when action-at-a-distance 
-  may do more to clarify rather than confound.
+excerpt: "모던 소프트웨어 개발은 골드버그 기계의 정수라고 할 수 있을 정도로 복잡해졌습니다. 그러나 부작용을 생산하는 코드에 대한 의혹에도 불구하고 때로는 기술이 혼란스러운 것보다 명확해질 수 있는 기회가 존재합니다."
 status:
   swift: 4.2
 ---
 
-By the 1930's,
-Rube Goldberg had become a household name,
-synonymous with the fantastically complicated and whimsical inventions
-depicted in comic strips like
-["Self-Operating Napkin."](https://upload.wikimedia.org/wikipedia/commons/a/a9/Rube_Goldberg%27s_%22Self-Operating_Napkin%22_%28cropped%29.gif)
-Around the same time,
-Albert Einstein popularized the phrase "spooky action at a distance"
-in his [critique](https://en.wikipedia.org/wiki/EPR_paradox)
-of the prevailing interpretation of quantum mechanics by Niels Bohr.
+1930년대에 Goldberg라는 이름은 ["자가 작동식 냅킨"](https://upload.wikimedia.org/wikipedia/commons/a/a9/Rube_Goldberg%27s_%22Self-Operating_Napkin%22_%28cropped%29.gif)처럼 환상적이게 복잡하며 만화에 그려질 것 같이 기발한 발명품을 뜻하는 말이 되었습니다. 동시에 Albert Einstein은 양자 기계에서 우세한 Niels Bohr의 이론에 대한 그의 [평론](https://en.wikipedia.org/wiki/EPR_paradox)에서 "양자 얽힘"이라는 단어를 유행하고 있었습니다.
 
-Nearly a century later,
-modern software development has become what might be seen as
-the quintessence of a Goldbergian contraption ---
-sprawling ever closer into that spooky realm by way of quantum computers.
+몇 세기 후에 모던 소프트웨어 개발은 Goldberg 기계의 정수라고 할 수 있을 정도로 복잡해졌습니다.
 
-As software developers,
-we're encouraged to reduce action-at-a-distance in our code whenever possible.
-This is codified in impressive-sounding guidelines like the
-[Single Responsibility Principle](https://en.wikipedia.org/wiki/Single_responsibility_principle),
-[Principle of Least Astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment),
-and [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter).
-Yet despite their misgivings about code that produces side effects,
-there are sometimes occasions where such techniques
-may clarify rather than confound.
+코드는 가능하면 얽히지 않게 하는 것이 좋습니다. 이는 [Single Responsibility Principle](https://en.wikipedia.org/wiki/Single_responsibility_principle), [Principle of Least Astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment), 그리고 [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter)와 같이 인상적인 가이드라인으로 성문화되어 있습니다. 그러나 부작용을 생산하는 코드에 대한 의혹에도 불구하고 때로는 기술이 혼란스러운 것보다 명확해질 수 있는 기회가 존재합니다.
 
-Such is the focus of this week's article about property observers in Swift,
-which offer a built-in, lightweight alternative
-to more formalized solutions like
-model-view-viewmodel (MVVM)
-functional reactive programming (FRP).
+그 중 하나가 이 주의 아티클의 주제인 Swift의 프로퍼티 옵저버입니다. 프로퍼티 옵저버는 Swift에 내장돼있으며 모델-뷰-뷰모델(MVVM), 함수형 반응형 프로그래밍 (FRP) 같은 공식화된 해결책의 대체재를 제공합니다.
 
 ---
 
-There are two kinds of properties in Swift:
-<dfn>stored properties</dfn>, which associate state with an object, and
-<dfn>computed properties</dfn>, which perform a calculation based on that state.
-For example,
+Swift의 프로퍼티에는 두 가지 종류가 있습니다. 하나는 상태를 객체와 연결하는 <dfn>저장된 프로퍼티 (stored properties)</dfn>이고, 또 다른 하나는 그 상태에 기반해서 계산을 하는 <dfn>계산된 프로퍼티 (computed properties)</dfn> 입니다.
 
 ```swift
 struct S {
-    // Stored Property
+    // 저장된 프로퍼티
     var stored: String = "stored"
 
-    // Computed Property
+    // 계산된 프로퍼티
     var computed: String {
         return "computed"
     }
 }
 ```
 
-When you declare a stored property,
-you have the option to define <dfn>property observers</dfn>
-with blocks of code to be executed when a property is set.
-The `willSet` observer runs before the new value is stored
-and the `didSet` observer runs after.
-And they run regardless of whether the old value is equal to the new value.
+저장된 프로퍼티를 선언했을 때는 <dfn>프로퍼티 옵저버</dfn>를 프로퍼티가 설정됐을 때 실행될 코드 블락과 함께 정의할 수 있는 선택지를 제공받습니다. `willSet` 옵저버는 새로운 값이 저장되기 전에 실행되고 `didSet` 옵저버는 이후에 실행되고 새로운 값이 예전 값과 같더라도 실행됩니다.
 
 ```swift
 struct S {
     var stored: String {
         willSet {
-            print("willSet was called")
-            print("stored is now equal to \(self.stored)")
-            print("stored will be set to \(newValue)")
+            print("willSet이 호출되었습니다")
+            print("stored가 지금은 \(self.stored)와 같습니다")
+            print("stored가 곧 \(newValue)로 값이 변경될 것입니다")
         }
 
         didSet {
-            print("didSet was called")
-            print("stored is now equal to \(self.stored)")
-            print("stored was previously set to \(oldValue)")
+            print("didSet이 호출되었습니다")
+            print("stored가 지금은 \(self.stored)와 같습니다")
+            print("stored의 이전 값은 \(oldValue) 였습니다")
         }
     }
 }
 ```
-
-For example,
-running the following code prints the resulting text to the console:
 
 ```swift
 var s = S(stored: "first")
 s.stored = "second"
 ```
 
-- <samp>willSet was called</samp>
-- <samp>stored is now equal to first</samp>
-- <samp>stored will be set to second</samp>
-- <samp>didSet was called</samp>
-- <samp>stored is now equal to second</samp>
-- <samp>stored was previously set to first</samp>
+위의 코드는 아래와 같은 텍스트를 출력할 것입니다.
 
-> An important caveat is that observers don't run
-> when you set a property in an initializer.
-> As of Swift 4.2,
-> you can work around that by wrapping the setter call in a `defer` block,
-> but that's
-> [a bug that will soon be fixed](https://twitter.com/jckarter/status/926459181661536256),
-> so you shouldn't depend on this behavior.
+- <samp>willSet이 호출되었습니다</samp>
+- <samp>stored가 지금은 first와 같습니다</samp>
+- <samp>stored가 곧 second로 값이 변경될 것입니다</samp>
+- <samp>didSet이 호출되었습니다</samp>
+- <samp>stored가 지금은 second와 같습니다</samp>
+- <samp>stored의 이전 값은 first 였습니다</samp>
+
+> 중요한 사실은 옵저버는 이니셜라이져에서 프로퍼티를 설정할 떄는 실행되지 않는다는 것입니다.
+> Swift 4.2에선 `defer` 블록에서 setter를 호출할 수 있지만 [이것은 버그라서 곧 수정될 것입니다](https://twitter.com/jckarter/status/926459181661536256). 무시하셔도 됩니다.
 
 ---
 
-Swift property observers have been part of the language
-from the very beginning.
-To better understand why,
-let's take a quick look at how things work in Objective-C:
+프로퍼티 옵저버는 Swift 초기부터 언어의 한 부분을 차지하고 있었습니다. 그 이유를 이해하기 위해 Objective-C에선 어떻게 작동하는지 둘러보겠습니다.
 
-## Properties in Objective-C
+## Objective-C에서의 프로퍼티
 
-In Objective-C,
-all properties are, in a sense, computed.
-Each time a property is accessed through dot notation,
-the call is translated into an equivalent getter or setter method invocation.
-This, in turn, is compiled into a message send
-that executes a function that reads or writes an instance variable.
+Objective-C의 프로퍼티는 어떤 의미에서 모두 계산된 프로퍼티입니다. 마침표 노테이션을 통해 프로퍼티에 접근할 때마다 그 호출은 getter 또는 setter를 발동하도록 번역됩니다. 그리고 인스턴스 변수를 읽거나 작성하는 함수를 실행하는 메세지로 컴파일됩니다.
 
 ```objc
-// Dot accessor
+// 마침표 접근법
 person.name = @"Johnny";
 
-// ...is equivalent to
+// ...은 다음과 같습니다
 [person setName:@"Johnny"];
 
-// ...which gets compiled to
+// ...는 이렇게 컴파일됩니다
 objc_msgSend(person, @selector(setName:), @"Johnny");
 
-// ...whose synthesized implementation yields
+// ...는 다음과 같이 구현됩니다
 person->_name = @"Johnny";
 ```
 
-Side effects are something you generally want to avoid in programming
-because they make it difficult to reason about program behavior.
-But many Objective-C developers had come to rely on the ability to
-inject additional behavior into getter or setter methods as needed.
+이는 프로그램이 작동하는 방식을 추측하 어렵게 만들기 때문에 프로그래밍할 때 피하고 싶은 그런 것을 부작용이 일어납니다. 하지만 많은 Objective-C 개발자들이 필요에 따라 getter 또는 setter 메소드에 추가 행동을 주입할 수 있는 기능 때문에 이에 의존하게 되었습니다.
 
-Swift's design for properties formalized these patterns
-and created a distinction between side effects
-that decorate state access (stored properties)
-and those that redirect state access (computed properties).
-For stored properties, the `willSet` and `didSet` observers
-replace the code that you'd otherwise include alongside ivar access.
-For computed properties, the `get` and `set` accessors
-replace code that you might implement for `@dynamic` properties in Objective-C.
+프로퍼티에 대한 Swift의 디자인은 이러한 패턴을 공식화하고 상태 접근을 데코레이트하는 부작용(저장된 프로퍼티)과 상태 접근을 리다이렉트하는 부작용 사이의 차이(계산된 프로퍼티)를 만듭니다. 저장된 프로퍼티의 경우 `willSet` 과 `didSet` 옵저버는 ivar 접근과 함께 포함시키지 않을 코드를 대체합니다. 계산된 프로퍼티의 경우 `get` 과 `set` 접근자는 Objective-C에서 `@dynamic` 프로퍼티로 구현할 코드를 대체합니다.
 
-As a result,
-we get more consistent semantics
-and better guarantees about mechanisms like
-Key-Value Observing (KVO) and
-Key-Value Coding (KVC) that interact with properties.
+결과적으로 우리는 더 일관성있는 의미와 프로퍼티와 상호작용하는 KVO (Key-Value Observing) 및 KVC (Key-Value Coding)같은 매커니즘에 대한 더 나은 보증을 얻게됩니다.
 
 ---
 
-So what can you do with property observers in Swift?
-Here are a couple ideas for your consideration:
+그래서 Swift에서 프로퍼티 옵저버로 할 수 있는 일은 무엇일까요?
+고려할만한 몇 가지 아이디어를 준비했습니다.
 
 ---
 
-## Validating / Normalizing Values
+## 값을 정규화하거나 검증할 때
 
-Sometimes you want to impose additional constraints
-on what values are acceptable for a type.
+때로는 타입에 허용되는 값의 추가적인 제한 조건을 넣고 싶을 때가 있습니다.
 
-For example,
-if you were developing an app that interfaced with a government bureaucracy,
-you'd need to ensure that the user wouldn't be able to submit a form
-if it was missing a required field,
-or contained an invalid value.
+만약 정부 관료를 대상으로 하는 앱을 개발중이라면 여러분은 사용자가 문서에 필수 요소를 빼먹거나 유효하지 않은 값을 제출할 수 없도록 확인해야 할 것입니다.
 
-If, say,
-a form required that names use capital letters without accents,
-you could use the `didSet` property observer
-to automatically strip diacritics and uppercase the new value:
+예를 들어 문서 폼에 이름이 악센트 없이 대문자만 필요로 한다면 `didSet` 프로퍼티 옵저버를 사용해서 자동으로 발음 구별 부호를 벗겨내고 새로운 값을 대문자로 만들 수 있습니다.
 
 ```swift
 var name: String? {
@@ -193,19 +123,11 @@ var name: String? {
 }
 ```
 
-Setting a property in the body of an observer (fortunately)
-doesn't trigger additional callbacks,
-so we don't create an infinite loop here.
-This is the same reason why this won't work as a `willSet` observer;
-any value set in the callback is immediately overwritten
-when the property is set to its `newValue`.
+옵저버의 바디에서 프로퍼티를 설정하는 것은 (다행히도) 추가적인 콜백을 호출하지 않습니다. 그러니 여기서 무한 루프는 만들어지지 않습니다. 이는 이것이 `willSet` 옵저버로 작동하지 않는 이유와 동일합니다. 프로퍼티가 `newValue` 로 설정되면 콜백에 설정된 값은 즉시 덮어씌워집니다.
 
-While this approach can work for one-off problems,
-repeat use like this is a strong indicator of business logic that
-could be formalized in a type.
+이 접근 방식은 일회성 문제에는 작동할 수 있어도 이와 같이 반복적으로 사용하는 것이 타입에서 공식화될 수 있는 비즈니스 로직의 강력한 지표입니다.
 
-A better design would be to create a `NormalizedText` type
-that encapsulates the requirements of text to be entered in such a form:
+더 나은 디자인은 폼에 입력될 텍스트들의 필수 사항들이 압축돼있는 `NormalizedText` 를 만드는 것입니다.
 
 ```swift
 struct NormalizedText {
@@ -241,25 +163,13 @@ struct NormalizedText {
 }
 ```
 
-A failable or throwing initializer
-can surface errors to the caller
-in a way that a `didSet` observer can't.
-Now, when a troublemaker like
-_Jøhnny_
-from _[Llanfair­pwllgwyngyll­gogery­chwyrn­drobwll­llan­tysilio­gogo­goch](https://en.wikipedia.org/wiki/Llanfairpwllgwyngyll)_
-comes a'knocking,
-we can give him what's for!
-(Which is to say,
-communicate errors to him in a reasonable manner
-rather than failing silently or allowing invalid data)
+failable 이나 이니셜라이져를 던지는 것은 `didSet` 옵저버가 할 수 없는 방식으로 호출자에게 에러를 타나낼 수 있습니다. 이제 _[Llanfair­pwllgwyngyll­gogery­chwyrn­drobwll­llan­tysilio­gogo­goch](https://en.wikipedia.org/wiki/Llanfairpwllgwyngyll)_ 의 _Jøhnny_ 같은 트러블메이커가 와도 그를 위해 무언가를 해줄 수 있습니다! (말하자면, 허용가능한 범위의 예절로 에러를 얘기하는 것이 유효하지 않은 데이터를 제공하는 것보다는 낫다는 말입니다)
 
-## Propagating Dependent State
+## 독립 상태 전파하기
 
-Another potential use case for property observers
-is propagating state to dependent components in a view controller.
+프로퍼티 옵저버의 또 다른 잠재적 사용 방안은 뷰 컨트롤러의 독립 컴포넌트에 상태를 전파하는 것입니다.
 
-Consider the following example of a `Track` model
-and a `TrackViewController` that presents it:
+`TrackViewController` 의 `Track` 모델로 예를 들어 보겠습니다.
 
 ```swift
 struct Track {
@@ -290,26 +200,18 @@ class TrackViewController: UIViewController {
 }
 ```
 
-When the `track` property of the view controller is set,
-the following happens automatically:
+뷰 컨트롤러의 `track` 프로퍼티가 설정되면 다음과 같은 상황이 자동으로 일어납니다.
 
-1. Any previous track's audio is paused
-2. The `title` of the view controller is set to the new track title
-3. The new track's audio is loaded and played
+1. 이전의 트랙(track)의 오디오는 일시정지됩니다.
+2. 뷰 컨트롤러의 `title`은 새로운 트랙의 제목으로 설정됩니다.
+3. 새로운 트랙의 오디오가 불러와지고 재생됩니다.
 
-_Pretty cool, right?_
+_끝내주지 않나요?_
 
-You could even cascade this behavior across multiple observed properties a la
-[that one scene from _Mousehunt_](https://www.youtube.com/watch?v=TVAhhVrpkwM).
+[_Mousehunt_ 의 한 장면](https://www.youtube.com/watch?v=TVAhhVrpkwM)처럼 여러 관찰된 프로퍼티에 걸쳐서 이 동작을 연결시킬 수 있습니다.
 
 ---
 
-As a general rule,
-side effects are something to avoid when programming,
-because they make it difficult to reason about complex behavior.
-Keep that in mind the next time you reach for this new tool.
+일반적으로 그것들은 복잡한 행동을 추측하기 어렵게 만들기 때문에 프로그래밍할 때 피하고 싶은 부작용을 일으킵니다. 그러니 다음 번에 이 새로운 도구를 사용할 때 꼭 기억하시길 바랍니다.
 
-And yet, from the tippy top of this teetering tower of abstraction,
-it can be tempting --- and perhaps sometimes rewarding ---
-to embrace the chaos of the system.
-Always following the rules is such a _Bohr_.
+그럼에도 불구하고 이 추상화의 탑 꼭대기에서는 시스템의 혼란을 받아들이는 것이 유혹이 될 수도 있고 때로는 보람을 느낄 수도 있을 것입니다. 항상 규칙을 따르는 것은 아인슈타인이 아닌 보어(Bohr)스러운 것입니다.
