@@ -2,7 +2,7 @@
 title: Bug Reporting
 author: Mattt
 translator: 김필권
-category: ""
+category: Miscellanea
 excerpt: >
     Radar에 신고해"라는 말을 듣고 그게 어떤 의미인지
     궁금했던 적이 있다면 이 주의 게시글에서 해결해드리겠습니다.
