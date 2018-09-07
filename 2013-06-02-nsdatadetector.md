@@ -12,7 +12,7 @@ status:
   swift: 4.2
 ---
 
-문맥이 없는 문장은 아무 것도 아닙니다.
+문맥이 없는 문장은 아무 의미가 없습니다.
 
 단어는 단어들 사이의 관계, 단어와 우리와의 관계 그리고 우리의 시간과 공간에 의해 무게를 갖게 됩니다.
 
@@ -67,32 +67,24 @@ NSDataDetector *detector =
 }];
 ```
 
+예상하셨듯이 위 코드를 실행하면 두 가지 결과가 만들어질 것입니다. 하나는 "123 Main St." 라는 주소고 다른 하나는 "(555) 555-1234" 라는 전화번호 입니다.
 
-As you might expect, running this code produces two results: the address "123 Main St." and the phone number "(555) 555-1234".
+> `NSdataDetector`를 초기화할 때는 관심있는 딱 하나의 타입만을 지정하세요. 왜냐하면 필요없는 타입들이 과정을 느리게 만들기 때문입니다.
 
+## 결과에서 의미있는 정보 뽑아내기
 
-> When initializing `NSDataDetector`, specify only the types you're interested in because any unused types will only slow you down.
+`NSDataDetector`는 `NSTextCheckingResult` 객체를 생성합니다.
 
+한편으로는 `NSDataDetector`가 실제로 `NSRegularExpression`의 서브 클래스이기 때문에 맞는 말이고, 다른 한편으로는 패턴 매치와 탐지되는 데이터 사이의 겹치는 부분이 많지 않습니다.
+그래서 여러분이 얻는 것은 어떤 상황에서 어떤 정보가 존재하는지에 대한 강력한 보장을 제공하지는 않는 오염된 API일 것입니다.
 
-## Discerning Information from Results
+> 설상가상으로 `NSTextCheckingResult` 는 `NSSpellServer` 에서도 쓰입니다.
+> _웩._
 
-
-`NSDataDetector` produces `NSTextCheckingResult` objects.
-
-
-On the one hand, this makes sense because `NSDataDetector` is actually a subclass of `NSRegularExpression`.
-On the other hand, there's not much overlap between a pattern match and detected data other than the range and type.
-So what you get is an API that's polluted and offers no strong guarantees about what information is present under which circumstances.
-
-
-> To make matters worse, `NSTextCheckingResult` is also used by `NSSpellServer`.
-> _Gross._
+데이터 탐지기의 결과에 대한 정보를 얻고 싶다면 먼저 `resultType` 을 확인해야 합니다. `resultType` 을 이용하면 속성을 통해 정보에 직접적으로 접근할 수 있습니다. (링크, 전화번호 그리고 날짜 처럼요.) 또는 `components` 속성의 키값을 통해 간접적으로 접근할 수도 있습니다. (주소와 교통 정보 등)
 
 
-To get information about data detector results, you need to first check its `resultType`; depending on that, you might access information directly through properties, (in the case of links, phone numbers, and dates), or indirectly by keyed values on the `components` property (for addresses and transit information).
-
-
-Here's a rundown of the various `NSDataDetector` result types and their associated properties:
+다음은 `NSDataDetector` 의 결과 타입과 관련된 속성의 개요입니다.
 
 <table>
   <thead>
