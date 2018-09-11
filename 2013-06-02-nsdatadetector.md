@@ -150,7 +150,7 @@ NSDataDetector *detector =
   </tbody>
 </table>
 
-## Data Detector Data Points
+## 실제 탐색 결과 알아보기
 
 이제 `NSDataDetector`를 그것의 페이스에 맞춰보겠습니다.
 그렇게하면 우리는 `NSDataDetector` 를 사용해서 전체 용량을 사용하는 방법에 대한 완벽한 예제를 얻게 될 뿐만 아니라 실제로 가능한 일들을 볼 수도 있습니다.
@@ -231,7 +231,7 @@ detector.enumerateMatches(in: string,
 > 하지만 여전히 `airline` 속성을 채우는 예는 찾을 수가 없었습니다.
 > 아는 분이 있다면 [저희에게 알려주세요](https://twitter.com/NSHipster/).
 
-## Detect (Rough) Edges
+## 아직 완벽하진 않습니다
 
 `NSDataDetector` 가 유용하긴 하지만 사용하기에 특별히 _좋은_ API는 아닙니다.
 
