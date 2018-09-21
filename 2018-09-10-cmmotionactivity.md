@@ -3,43 +3,26 @@ title: CMMotionActivity
 author: Mattt
 translator: 김필권
 category: Cocoa
-excerpt: >
-  Today's iPhones are packed with a full complement of sensors that includes
-  cameras, barometers, gyroscopes, magnetometers, and accelerometers.
-  Like humans, they use permutations of different sensory information
-  to make determinations about their position and orientation,
-  often by means quite similar to our own biomechanical processes.
+excerpt: "오늘날의 iPhone은 카메라, 기압계, 자이로스코프, 자력계 그리고 가속계를 모두 포함하고
+있습니다. 게다가 사람처럼 감각적인 정보의 변화를 감지하고 위치와 방향이 어떤지 결정할 수 있으며 때론 우리의 생체 역학적인 과정과 비슷할 때도 있습니다."
 status:
   swift: 4.2
 ---
 
+사람은 시각계, 자기수용, 전정계 등에서 전달되는 감각적인 정보를 통해 자신이 어떤 행동을 하고 있는지 감지합니다. 그 중에서도 가장 우선시 되는 것은 전정계로, 전정계는 방향의 변화를 감지하는 *반고리관*과 수평과 수직에 예민한 *이석* 으로 구성되어 있습니다.
 
-Humans perceive self-motion using a combination of sensory information from their visual, proprioceptive, and vestibular systems.
-Of these, the primary determination is made by the vestibular system, comprising the <dfn>semicircular canals</dfn>, which sense changes in rotation, and the <dfn>otoliths</dfn>, which are sensitive to horizontal and vertical forces.
+오늘날의 iPhone은 카메라, 기압계, 자이로스코프, 자력계 그리고 가속계를 모두 포함하고 있습니다.
+게다가 사람처럼 감각적인 정보의 변화를 감지하고 위치와 방향이 어떤지 결정할 수 있으며 때론 우리의 생체 역학적인 과정과 비슷할 때도 있습니다.
 
+감각적인 입력을 이해한다는 것은 그 주체가 누구냐에 상관없이 어려운 일입니다. 결정하기엔 너무나도 많은 정보들이 존재하고 있기 때문이죠. (젠장, 우리 종족은 이 결정을 올바르게 내리기까지 수백만년이 걸렸고 승강기나 비행기 또는 롤러 코스터같은 발명품 앞에서는 여전히 혼란스럽다구요!)
 
-Today's iPhones are packed with a full complement of sensors that includes cameras, barometers, gyroscopes, magnetometers, and accelerometers.
-Like humans, they use permutations of different sensory information to make determinations about their position and orientation, often by means quite similar to our own biomechanical processes.
-
-
-Making sense of sensory inputs --- no matter their origin --- is challenging.
-There's just so much information to consider.
-(Heck, it took our species a few million years to get that right, and we're still confused by newfangled inventions like elevators, planes, and roller coasters.)
-
-
-After several major OS releases and hardware versions, Apple devices have become adroit at differentiating between different means of locomotion.
-But before you run off and try to write your own implementation, stop and consider using the built-in APIs discussed in this week's article.
-
+몇 번에 걸친 OS와 하드웨어 업그레이드를 통해 Apple의 기기는 다른 방식의 운동을 민첩하게 구별할 수 있게 되었습니다. 그래서 직접 구현할 필요도 없는 데다가 오늘의 주제가 내장된 API에 대해 토론하는 것입니다!
 
 ---
 
+iOS와 watchOS에선 `CMMotionActivityManager` 가 가공되지 않은 센서 데이터를 기기에서 받으며 여러분이 움직이고 있는지, 움직이고 있다면 걷고 있는지 달리고 있는지 자전거를 타는지 또는 운전중인지를 알려줍니다.
 
-On iOS and watchOS, `CMMotionActivityManager` takes raw sensor data from the device and tells you (to what degree of certainty) whether the user is currently moving, and if they're walking, running, biking, or driving in an automobile.
-
-
-To use this API, you create an activity manager and start listening for activity updates using the `startActivityUpdates` method.
-Each time the device updates the motion activity, it executes the specified closure, passing a `CMMotionActivity` object.
-
+이 API를 사용하려면 액티비티 매니저를 생성하고 `startActivityUpdates` 메소드를 사용해서 업데이트가 있는지 들을 수 있게 해야합니다. 기기가 모션 액티비티를 업데이트할 때마다 startActivityUpdates는 여러분이 정해놓은 클로저에 `CMMotionActivity` 객체를 전달하고 실행할 것입니다.
 
 ```swift
 let manager = CMMotionActivityManager()
@@ -69,119 +52,79 @@ manager.startActivityUpdates(to: .main) { (activity) in
 }
 ```
 
+`CMMotionActivityManager` 는 Core Motion 프레임워크가 제공합니다. Core Motion을 지원하는 기기라면 모두 모션 보조 프로세서(coprocessor)를 장착하고 있습니다. 그 장착된 기계 덕분에 시스템은 모든 센서의 처리과정이 CPU에서 일어나는 일을 없애고 에너지 사용량을 최소화할 수 있게 되었습니다.
 
-`CMMotionActivityManager` is provided by the Core Motion framework.
-Devices that support Core Motion are equipped with a motion coprocessor.
-By using dedicated hardware, the system can offload all sensor processing from the CPU and minimize energy usage.
+_M-시리즈_ 보조 프로세서의 첫 번째는 M7이었고 2013년 9월에 아이폰 5S에 장착되었습니다. 그와 동시에 iOS 7과 Core Motion API가 발표되었습니다.
 
+## 운전자에 특화된 기능이 있습니다
 
-The first of the _M-series_ coprocessors was the M7, which arrived in September 2013 with the iPhone 5S.
-This coincided with the release of iOS 7 and the Core Motion APIs.
+아마도 모션 액티비티가 가장 잘 사용된 곳은 iOS 11에 추가된 ["운전 중 방해 금지 모드"](https://support.apple.com/en-us/HT208090)일 것입니다. 이 기능이 소개된 이후로 자동차에 있는 것을 감지하는게 훨씬 좋아졌습니다.
 
+> 낮은 속도에선 가속계에서 오는 정보 하나만으론 자동차를 타고있다고 결정하기가 어려웠습니다.
+> 추측밖에 할 수 없지만 아마도 iPhone은 이 기능에 기기의 나침반에 있는 자력계 데이터를 사용하는 것으로 보입니다.
+> 왜냐하면 보통의 차량은 금속에 둘러싸여있고 전자기 흐름이 감소될 것이기 때문입니다.
 
-## Feature Drivers
+이 기능을 통해 안전 문제를 해결하는 것을 넘어서 어떤 앱들은 화면을 사용자의 상태에 따라 바꾸기도 할 것입니다. 예를 들어 배달 서비스 앱의 경우엔 배달원의 모션 액티비티의 변화에 기반해서 배달 예상 시간을 계산하거나 매장에서 픽업했다면 이를 고객에게 알릴 수도 있을 것입니다.
 
+## 아무 행동없이 움직이는 것은 어떤 상태일까요?
 
-Possibly the most well-known use of motion activities is ["Do Not Disturb While Driving"](https://support.apple.com/en-us/HT208090), added in iOS 11.
-Automotive detection got much better with the introduction of this feature.
+`CMMotionActivity` 는 서로 다른 종류의 모션에 대한 Boolean 속성을 가지고 있으며 심지어 움직임에 변화가 있는지를 알려주는 값도 존재합니다. 논리적으로 생각해보면 걷는 것과 운전하는 것을 동시에 할 수 없는데 이런 값이 있는 것은 직관적이지 않아 보일 수도 있습니다.
 
+이 부분은 [`CMMotionActivity` 문서](https://developer.apple.com/documentation/coremotion/cmmotionactivity)에 명확하게 잘 설명돼 있습니다.
 
-> At low speeds, it's hard to distinguish automobile travel from other means using accelerometer data alone.
-> Although we can only speculate as to how this works, it's possible that the iPhone uses magnetometer data from the device compass.
-> Because cars and other vehicles are often enclosed in metal, electromagnetic flux is reduced.
+> 이 클래스의 모션 관련 속성은 서로 배타적이지 않습니다.
+> 다르게 말하자면 하나 이상의 모션 관련 속성이 `true` 값을 가질 수 있다는 것을 의미합니다.
+> 예를 들면 사용자가 **자동차를 운전하고 있고** 자동차가 빨간 불에 멈췄다면 그 변화에 관련된 이벤트의 모션 관련 속성은 `cycling` 과 `stationary` 가 `true` 로 올 것입니다.
 
+잠깐만요, 혹시 제가 명확하다고 말했었나요? 반댓말이 어떤건지 모르곘지만 그거일수도 있겠네요. (저는 `automotive` 값이 `true` 가 되어야 한다고 생각했거든요.) 다행히도 문서의 앞부분에선 우리가 예상한 부분에 대해 얘기합니다. 다음은 여러 상황에서 API가 어떻게 작동하는지에 대한 예제입니다.
 
-Beyond safety concerns, some apps might change their behavior according to the current mode of transportation.
-For example, a delivery service app might relay changes in motion activity to a server to recalculate estimated ETA or change the UI to communicate that the courier has parked their vehicle and are now approaching by foot.
-
-
-## Traveling Without Moving
-
-
-`CMMotionActivity` has Boolean properties for each of the different types of motion as well as one for whether the device is stationary.
-This seems counter-intuitive, as logic dictates that you can either be walking or driving a car at a given moment, but not both.
-
-
-This point is clarified by the [`CMMotionActivity` documentation](https://developer.apple.com/documentation/coremotion/cmmotionactivity):
-
-
-> The motion-related properties of this class are not mutually exclusive.
-> In other words, it is possible for more than one of the motion-related properties to contain the value `true`.
-> For example, if the user was **driving in a car** and the car stopped at a red light, the update event associated with that change in motion would have both the `cycling` and `stationary` properties set to true.
-
-
-Wait, did I say clarified?
-I meant... whatever the opposite is.
-(I'm pretty sure this should be `automotive`)
-Fortunately, the header docs tell us more about what we might expect.
-Here are some concrete examples of how this API behaves in different situations:
-
-
-**Scenario 1**:
-You're in a car stopped at a red light
+**시나리오 1**
+차 안에 있는데 빨간 불이라서 멈췄을 때
 
 | 🚶‍ `walking` | 🏃‍ `running` | 🚴‍`cycling` | 🚗 `automotive` | 🛑 `stationary` |
 | ------------- | ------------- | ------------ | --------------- | --------------- |
 | `false`       | `false`       | `false`      | `true`          | `true`          |
 
-
-**Scenario 2**:
-You're in a moving vehicle
+**시나리오 2**
+움직이는 차량안에 있을 때
 
 | 🚶‍ `walking` | 🏃‍ `running` | 🚴‍`cycling` | 🚗 `automotive` | 🛑 `stationary` |
 | ------------- | ------------- | ------------ | --------------- | --------------- |
 | `false`       | `false`       | `false`      | `true`          | `false`         |
 
-
-**Scenario 3**:
-The device is in motion, but you're neither walking nor in a moving vehicle
+**시나리오 3**
+기기는 움직이고 있는데 나는 걷지도 운전하고 있지도 않을 때
 
 | 🚶‍ `walking` | 🏃‍ `running` | 🚴‍`cycling` | 🚗 `automotive` | 🛑 `stationary` |
 | ------------- | ------------- | ------------ | --------------- | --------------- |
 | `false`       | `false`       | `false`      | `false`         | `false`         |
 
+**시나리오 4**
+당신은 용의자를 추적중인 세계에서 제일 유명한 탐정이고 지금은 움직이는 기차의 복도를 따라 움직이다가 마지막 칸에 도착해서 용의자가 어디에 숨었을 지 찾느라 멈췄습니다.
+_(어디 구석에 사람 크기의 박스가 있지 않을까요?)_
 
-**Scenario 4**:
-You're a world-famous detective, who, in the process of chasing a suspect down the corridors of a moving train, has reached the last car and has stopped to look around to surmise where they're hiding
-_(perhaps that conspicuous, person-sized box in the corner?)_
-
-| 🚶‍ `walking` | 🏃‍ `running` | 🚴‍`cycling` | 🚗 `automotive` | 🛑 `stationary` | 🕵️‍🇧🇪 `poirot` |
+| 🚶‍ `walking` | 🏃‍ `running` | 🚴‍`cycling` | 🚗 `automotive` | 🛑 `stationary` | 🕵️‍🇧🇪 `에르퀼 푸아로` |
 | ------------- | ------------- | ------------ | --------------- | --------------- | --------------- |
 | `false`       | `true`        | `false`      | `true`          | `true`          | `true`          |
 
+(마지막 시나리오는 정말 이렇게 될 지 확신이 없네요...)
 
-(We're actually not sure what would happen in that last scenario...)
+그 문서가 말해주는 전반적인 지침은 `stationary` 를 `CMMotionActivity`의 다른 속성들과는 같이 사용할 수 있도록 취급해야 한다는 것입니다. 그렇게 한다면 다른 모든 조합들에 대비할 수 있을 것입니다.
 
+또한 각각의 `CMMotionActivity` 객체에는 `.low`, `.medium`, 그리고 `.high` 값을 가지는 `confidence` 속성이 있습니다. 불행히도 문서에는 이 값들이 어떤 것이며 어떻게 쓰여야 하는 지에 대한 설명이 명확하게 적혀있지 않습니다. 종종 그래왔듯이 경험적인 접근 방식이 필요합니다. 여러분의 앱에 값을 다르게 적용해서 사용해보면서 어떤 값이 적절한 결과를 반환하는지 알아내야 할 것입니다.
 
-The overall guidance from the documentation is that you should treat `stationary` to be orthogonal from all of the other `CMMotionActivity` properties and that you should be prepared to handle all other combinations.
+## 위치 쿼리와 조합해서 사용하기
 
+여러분의 사용 예시에 따라 [Core Location](https://nshipster.com/core-location-in-ios-8/) 데이터와 Core Motion을 같이 사용하는 것은 좋은 결과를 만들어낼 수도 있을 것입니다.
 
-Each `CMMotionActivity` object also includes a `confidence` property with possible values of `.low`, `.medium`, and `.high`.
-Unfortunately, not much information is provided by the documentation about what any of these values mean, or how they should be used.
-As is often the case, an empirical approach is recommended;
-test your app in the field to see when different confidence values are produced and use that information to determine the correct behavior for your app.
+시간별 위치 변화에 낮은 신뢰도의 모션 액티비티를 추가하는 것만으로도 정확도를 높일 수 있습니다. 다음은 운송 수단의 종류별 속도 범위 가이드라인입니다.
 
+- 걷는 속도는 보통 최대 초당 2.5미터입니다. (5.6 mph, 9 km/h)
+- 달리는 속도는 초당 2.5미터에서 7.5미터입니다. (5.6 ~ 16.8 mph, 9 ~ 27 km/h)
+- 자전거의 속도는 초당 3미터에서 12미터입니다. (6.7 - 26.8 mph, 10.8 ~ 43.2 km/h)
+- 차량의 속도는 초당 100미터도 넘을 수 있습니다. (220 mph, 360 km/h)
 
-## Combining with Location Queries
-
-
-Depending on your use case, it might make sense to coordinate Core Motion readings with [Core Location](https://nshipster.com/core-location-in-ios-8/) data.
-
-
-You can combine changes in location over time with low-confidence motion activity readings to increase accuracy.
-Here are some general guidelines for typical ranges of speeds for each of the modes of transportation:
-
-
-- Walking speeds typically peak at 2.5 meters per second (5.6 mph, 9 km/h)
-
-- Running speeds range from 2.5 to 7.5 meters per second (5.6 – 16.8 mph, 9 – 27 km/h)
-
-- Cycling speeds range from 3 to 12 meters per second (6.7 – 26.8 mph, 10.8 – 43.2 km/h)
-
-- Automobile speeds can exceed 100 meters per second (220 mph, 360 km/h)
-
-
-Alternatively, you might use location data to change the UI depending on whether the current location is in a body of water.
+또는 위치 정보를 사용해서 지금 물 속에 있는지를 알아내서 UI를 변경할 수도 있습니다.
 
 ```swift
 if currentLocation.intersects(waterRegion) {
@@ -193,14 +136,10 @@ if currentLocation.intersects(waterRegion) {
 }
 ```
 
-
-However, location data should only be consulted if absolutely necessary --- and when you do, it should be done sparingly, such as by monitoring for only significant location changes.
-Reason being, location data requires turning on the GPS and/or cellular radio, which are both energy intensive.
+하지만 위치 데이터는 정말로 필요할때만 사용해야 하기때문에 의미있는 위치 변화가 있을 때만 사용하는 식으로 아껴야 합니다. 왜냐하면 위치 데이터는 에너지를 크게 잡아먹는 GPS에 필요하면 셀룰러까지 켜야하기 때문입니다.
 
 ---
 
+`CMMotionActivityManager` 는 Core Motion을 대표하는 훌륭한 API 중 하나이며 덕분에 우리는 이 API를 통해 몰입력과 반응성이 좋은 앱을 만들 수 있게 되었습니다.
 
-`CMMotionActivityManager` is one of many great APIs in Core Motion that you can use to build immersive, responsive apps.
-
-
-If you haven't considered the potential of incorporating device motion into your app (or maybe haven't looked at Core Motion for a while), you might be surprised at what's possible.
+지금까지 기기의 모션을 합치는 것의 잠재력을 생각해보지 않았거나 Core Motion을 처음 아셨다면 더 알아보시기를 추천드립니다. 어떤 기능이 되는지 알게된다면 놀라실 것입니다!
