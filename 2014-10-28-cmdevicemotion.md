@@ -3,10 +3,7 @@ title: CMDeviceMotion
 author: Nate Cook, Mattt Zmuda
 translator: 김필권
 category: Cocoa
-excerpt: >
-  Beneath the smooth glass of each iPhone
-  an array of sensors sits nestled on the logic board,
-  sending a steady stream of data to a motion coprocessor.
+excerpt: "iPhone의 액정 뒷면에선 수 많은 센서들이 데이터의 흐름을 꾸준히 모션 보조 프로세서에 보내고 있습니다."
 status:
   swift: 4.2
 ---
@@ -105,12 +102,9 @@ manager.stopAccelerometerUpdates()
 
 ## 가속도계 실제로 사용해보기
 
+폰이 기울어져도 항상 제자리를 지키는 배경화면을 만들어보겠습니다.
 
-Let's say we want to give the splash page of our app a fun effect, such that the background image remains level no matter how the phone is tilted.
-
-
-Consider the following code:
-
+다음과 같이 짤 수 있을 것입니다:
 
 ```swift
 if manager.isAccelerometerAvailable {
@@ -129,37 +123,28 @@ if manager.isAccelerometerAvailable {
 }
 ```
 
+먼저 확인해야 할 사항은 기기의 가속도계 데이터가 사용 가능한지입니다.
+다음은 잦은 주기로 업데이트하도록 하는 것입니다.
+마지막으로 `UIImageView` 속성을 회전해야 할 클로저를 업데이트하는 것입니다.
 
-First, we check to make sure our device makes accelerometer data available.
-Next we specify a high update frequency.
-And then finally, we begin updates to a closure that will rotate a `UIImageView` property:
+각 `CMAccelerometerData` 객체는 `x`, `y` 그리고 `z` 값을 가지고 있습니다. 각 값은 그 축에 맞는 중력장(G-forces)의 가속도값을 의미합니다. (1G = 지구의 중력)
+만약 기기가 가만히 있고 똑바로 서 있으며 세로 방향이라면 `(0, -1, 0)` 값을 가질 것입니다.
+테이블에 등을 대고 평평하게 누워있다면 `(0, 0, -1)` 값일 것입니다.
+45도 오른쪽으로 기울어있다면 `(0.707, -0.707, 0)` 값을 가질 것입니다.
 
-
-Each `CMAccelerometerData` object includes an `x`, `y`, and `z` value --- each of these shows the amount of acceleration in G-forces (where 1G = the force of gravity on Earth) for that axis.
-If your device were stationary and standing straight up in portrait orientation, it would have acceleration `(0, -1, 0)`;
-laying flat on its back on the table, it would be `(0, 0, -1)`;
-tilted forty-five degrees to the right, it would be something like `(0.707, -0.707, 0)` _(dat √2 tho)_.
-
-
-We calculate the rotation with the [two-argument arctangent function (`atan2`)](https://en.wikipedia.org/wiki/Atan2) using the `x` and `y` components from the accelerometer data.
-We then initialize a `CGAffineTransform` using that calculate rotation.
-Our image should stay right-side-up, no matter how the phone is turned --- here, it is in a hypothetical app for the _National Air & Space Museum_ (my favorite museum as a kid):
-
+회전을 계산할 때는 [2인자 아크탄젠트 함수(`atan2`)](https://en.wikipedia.org/wiki/Atan2)를 사용한 다음 `CGAffineTransform` 을 초기화했습니다.
+우리의 이미지는 폰이 기울어져도 항상 올바른 방향을 유지해야 합니다. 아래 예제는 어릴때부터 좋아하던 _National Air & Space Museum_ 의 앱입니다.
 
 ![Rotation with accelerometer]({% asset cmdm-accelerometer.gif @path %})
 
+결과는 심각하게 만족스럽지 않습니다. 이미지의 움직임은 지직거리며 기기를 움직이는 것이 회전하는 것에 비해 가속도계에 동일하거나 그 이상의 영향을 미칩니다.
+이 이슈는 여러 값을 합치면 완화할 수 있는 일이지만 그 대신에 우리는 자이로스코프를 더 좋게 만들것입니다.
 
-The results are not terribly satisfactory --- the image movement is jittery, and moving the device in space affects the accelerometer as much as or even more than rotating.
-These issues _could_ be mitigated by sampling multiple readings and averaging them together, but instead let's look at what happens when we involve the gyroscope.
+## 자이로스코프 추가하기
 
-
-## Adding the Gyroscope
-
-
-Rather than use the raw gyroscope data that we would get by calling the `startGyroUpdates...` method, let's get composited gyroscope _and_ accelerometer data by requesting the unified"device motion" data.
-Using the gyroscope, Core Motion separates user movement from gravitational acceleration and presents each as its own property of the `CMDeviceMotion` object.
-The code is very similar to our first example:
-
+가공하지 않은 자이로스코프 데이터를 쓰는 것 대신에 우리는 `startGyroUpdates...` 메소드를 호출할 것입니다. 그 이후에 자이로스코프 값과 가속도계 값을 합쳐서 하나의 "device motion" 데이터를 만들 것입니다.
+자이로스코프를 쓰면 Core Motion이 사용자의 움직임을 중력 가속도에서 분리할 수 있고 `CMDeviceMotion` 객체의 속성에 표현할 수 있게 됩니다.
+코드 자체는 처음 예제와 크게 다르지 않습니다.
 
 ```swift
 if manager.isDeviceMotionActive {
@@ -179,8 +164,7 @@ if manager.isDeviceMotionActive {
 }
 ```
 
-
-_Much better!_
+_훨씬 낫네요!_
 
 
 ![Rotation with gravity]({% asset cmdm-gravity.gif @path %})
@@ -188,15 +172,10 @@ _Much better!_
 
 ## UIClunkController
 
+또한 우리는 합쳐진 자이로 / 가속도계 데이터의 비 중력 영역을 새로운 상호작용 메소드로 사용할 수 있습니다.
+예를 들면 `CMDeviceMotion` 의 `userAcceleration` 속성을 사용하면 사용자가 왼손으로 왼쪽 화면을 눌렀을 경우 뒤로가게 만들 수도 있습니다.
 
-We can also use the other, non-gravity portion of this composited gyro / acceleration data to add new methods of interaction.
-In this case, let's use the `userAcceleration` property of `CMDeviceMotion` to navigate backward whenever the user taps the left side of the device against their hand.
-
-
-Remember that the X-axis runs laterally through the device in our hand, with negative values to the left.
-If we sense a _user_ acceleration to the left of more than 2.5 Gs, that's our cue to pop the view controller from the stack.
-The implementation is only a couple lines different from our previous example:
-
+X축은 우리의 손에서 음의 값에서 양의 값을 가진다는 것을 기억하세요. 그리고 가속도가 2.5 G이상을 감지하면 뷰 컨트롤러를 뒤로가게 합시다. 결과 코드는 이전의 예제와 몇 줄 다르지 않습니다.
 
 ```swift
 if manager.isDeviceMotionActive {
@@ -214,50 +193,37 @@ if manager.isDeviceMotionActive {
 }
 ```
 
+_잘 작동하네요!_
 
-_Works like a charm!_
-
-
-Tapping the device in a detail view immediately takes us back to the list of exhibits:
-
+상세 화면을 누르면 즉시 전시회 목록으로 가게될 것입니다.
 
 ![Clunk to go back]({% asset cmdm-clunk.gif @path %})
 
+## 또 다른 기능 만들어보기
 
-## Getting an Attitude
+자이로스코프 데이터를 포함하면서 얻은 것은 더 나은 가속도계 데이터뿐만이 아닙니다.
+우리는 기기의 실제 방향도 알 수 있게 되었습니다.
+그 데이터는 `CMDeviceMotion` 객체의 `attitude` 속성으로 접근 가능하며 `CMAttitude` 객체로 압축되어 있습니다.
+`CMAttitude` 는 기기의 방향에 대한 세 가지 서로 다른 표현을 가지고 있습니다.
 
+- 오일러 각,
+- 쿼터니언,
+- 회전 행렬 입니다.
 
-Better acceleration data isn't the only thing we gain by including gyroscope data:
-we now also know the device's true orientation in space.
-This data is accessed via the `attitude` property of a `CMDeviceMotion` object and encapsulated in a `CMAttitude` object.
-`CMAttitude` contains three different representations of the device's orientation:
+각 표현법은 주어진 참조 프레임에 관련이 있습니다.
 
+### 참조할만한 프레임 찾기
 
-- Euler angles,
-- A quaternion,
-- A rotation matrix.
+참조 프레임을 계산되는 장치의 방향이라고 생각하실 수도 있습니다. 4개 참조 프레임은 모두 테이블에 누워있는 기기를 설명하고 있어서 향하는 방향에 대해 더 구체적으로 표현합니다.
 
+- `CMAttitudeReferenceFrameXArbitraryZVertical` 은 평평한 바닥(Z축 수직)에 누워있으며 "임의의" X축 값으로 기기의 위치를 표현합니다. 실제로 X축은 기기 모션 업데이트를 시작한 _처음_ 위치에 고정되어 있습니다.
+- `CMAttitudeReferenceFrameXArbitraryCorrectedZVertical` 은 거의 똑같지만 자기계를 사용해서 자이로스코프의 측정의 다양함을 바로잡기 위해 사용했습니다.
+- `CMAttitudeReferenceFrameXMagneticNorthZVertical` 은 바닥에 누워있고 X축이 자기장의 북쪽을 가리키는 값을 표현합니다. (마주보고 있다면 세로 모드일때를 뜻합니다) 이 설정을 사용하려면 사용자가 자기계를 보정하기 위해 해당 기기로 8자 모션을 수행해야 합니다.
+- `CMAttitudeReferenceFrameXTrueNorthZVertical` 은 위와 동일하지만 자기와 실제 북쪽 불일치가 일어나지 않도록 조정하기 때문에 추가적인 위치 데이터가 필요합니다.
 
-Each of these is in relation to a given reference frame.
+우리의 경우엔 기본값인 "임의의" 참조 프레임도 괜찮을 것 같네요. (왜그런지는 곧 보여드리겠습니다.)
 
-
-### Finding a Frame of Reference
-
-
-You can think of a reference frame as the resting orientation of the device from which an attitude is calculated.
-All four possible reference frames describe the device laying flat on a table, with increasing specificity about the direction it's pointing.
-
-
-- `CMAttitudeReferenceFrameXArbitraryZVertical` describes a device laying flat (vertical Z-axis) with an "arbitrary" X-axis. In practice, the X-axis is fixed to the orientation of the device when you _first_ start device motion updates.
-- `CMAttitudeReferenceFrameXArbitraryCorrectedZVertical` is essentially the same, but uses the magnetometer to correct possible variation in the gyroscope's measurement over time.
-- `CMAttitudeReferenceFrameXMagneticNorthZVertical` describes a device laying flat, with its X-axis (that is, the right side of the device in portrait mode when it's facing you) pointed toward magnetic north. This setting may require the user to perform that figure-eight motion with their device to calibrate the magnetometer.
-- `CMAttitudeReferenceFrameXTrueNorthZVertical` is the same as the last, but it adjusts for magnetic / true north discrepancy and therefore requires location data in addition to the magnetometer.
-
-
-For our purposes, the default "arbitrary" reference frame will be fine (you'll see why in a moment).
-
-
-### Euler Angles
+### 오일러 각
 
 
 Of the three attitude representations, Euler angles are the most readily understood, as they simply describe rotation around each of the axes we've already been working with.
