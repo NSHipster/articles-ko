@@ -11,62 +11,43 @@ status:
   swift: 4.2
 ---
 
+iPhone의 액정 뒷면에선 수 많은 센서들이 데이터의 흐름을 꾸준히 모션 보조 프로세서에 보내고 있습니다.
 
-Beneath the smooth glass of each iPhone an array of sensors sits nestled on the logic board, sending a steady stream of data to a motion coprocessor.
-
-
-The [Core Motion framework](https://developer.apple.com/documentation/coremotion) makes it surprisingly easy to harness these sensors, opening the door to user interactions above and beyond the tapping and swiping we do every day.
+[Core Motion 프레임워크](https://developer.apple.com/documentation/coremotion)는 센서들을 이용해서 사용자가 탭이나 스와이프 하기 전과 후의 상호작용을 가능하게 해주는 것을 놀랍도록 쉽게 만들었습니다.
 
 ---
 
+Core Motion은 iOS나 watchOS 기기의 위치(position)와 방향(orientation)의 변화를 관찰하고 반응하는 것을 가능하게 해줍니다.
+헌신적인 모션 보조 프로세서덕분에 iPhone, iPad 그리고 Apple Watch는 CPU나 배터리의 큰 소모 없이 내장 센서들의 입력을 읽고 처리할 수 있게 되었습니다.
 
-Core Motion lets you observe and respond to changes in the position and orientation of an iOS or watchOS device.
-Thanks to their dedicated motion coprocessor, iPhones, iPads, and Apple Watches can continuously read and process inputs from built-in sensors without taxing the CPU or draining the battery.
+가속도계와 자이로스코프 데이터는 기기의 중심을 기준으로 3D 좌표 공간에 투영됩니다.
 
+![기기의 X축, Y축, Z축]({% asset cmdm-axes.png @path %})
 
-Accelerometer and gyroscope data is projected into a 3D coordinate space, with the center of the device at the origin.
+iPhone을 세로로 들고 있을 때:
 
-
-![Device X-, Y-, and Z-axes]({% asset cmdm-axes.png @path %})
-
-
-For an iPhone held in portrait orientation:
-
-
-- The X-axis runs the width of the device from left (negative values) to right (positive values),
-- The Y-axis runs the height of the device from bottom (-) to top (+),
-- The Z-axis runs perpendicularly through the screen from the back (-) to the front (+).
-
+- X축은 기기의 가로만큼 왼쪽(음수 값)에서 오른쪽(양수 값)의 값을 가집니다.
+- Y축은 아래(-)에서 위(+)로 기기의 높이만큼의 값을 가집니다.
+- Z축은 화면을 수직으로 뒤(-)에서 앞(+)의 값을 가집니다.
 
 ## CMMotionManager
 
+`CMMotionManager` 클래스는 해당 기기의 모션에 대한 데이터를 제공합니다.
+퍼포먼스를 가장 높은 수준으로 유지하려면 하나의 공유된 `CMMotionManager` 를 만들고 사용하는 것이 좋습니다.
 
-The `CMMotionManager` class is responsible for providing data about the motion of the current device.
-To keep performance at the highest level, create and use a single shared `CMMotionManager` instance throughout your app.
+`CMMotionManager` 는 센서 정보에 따라 네 가지 다른 인터페이스를 제공합니다.
 
+- `가속도계(accelerometer)` 는 속도의 변화인 가속도를 측정합니다.
+- `자이로스코프(gyroscope)` 는 기기의 자세나 방향을 측정합니다.
+- `자기계(magnetometer)` 는 기기에 대한 지구 자기장을 측정하는 나침반입니다.
 
-`CMMotionManager` provides four different interfaces for sensor information, each with corresponding properties and methods to check hardware availability and access measurements.
+각 센서가 개별적으로 읽는 것 말고도 `CMMotionManager` 는 하나로 합쳐진 "device motion" 인터페이스를 제공하며 이는 센서 융합 알고리즘을 사용해서 각 센서에서 읽어온 값을 조합하고 하나로 합쳐진 뷰를 제공합니다.
 
+### 사용 가능성 확인하기
 
-- The <dfn>accelerometer</dfn> measures <dfn>acceleration</dfn>,
-  or changes in velocity over time.
-- The <dfn>gyroscope</dfn> measures <dfn>attitude</dfn>,
-  or the orientation of the device.
-- The <dfn>magnetometer</dfn> is essentially a compass,
-  and measures the Earth's magnetic field relative to the device.
+오늘날의 Apple 기기들 대부분 표준 센서를 가지고 나옴에도 불구하고 모션 데이터를 읽기 전에 해당 기기가 그 기능을 사용할 수 있는지 확인하는 것은 훌륭한 아이디어입니다.
 
-
-In addition to these individual readings, `CMMotionManager` also provides a unified "device motion" interface, which uses sensor fusion algorithms to combine readings from each of these sensors into a unified view of the device in space.
-
-
-### Checking for Availability
-
-
-Although most Apple devices these days come with a standard set of sensors, it's still a good idea to check for the capabilities of the current device before attempting to read motion data.
-
-
-The following examples involve the accelerometer, but you could replace the word "accelerometer" for the type of motion data that you're interested in (such as "gyro", "magnetometer", or "deviceMotion"):
-
+다음 예제는 가속도계를 사용하고 있지만 "accelerometer" 단어를 원하는 모션 데이터("gyro", "magnetometer", "deviceMotion" 등)로 변경하면 그에 맞게 사용가능합니다.
 
 ```swift
 let manager = CMMotionManager()
@@ -75,45 +56,33 @@ guard manager.isAccelerometerAvailable else {
 }
 ```
 
+### Push vs Pull
 
-### Push vs. Pull
+Core Motion은 모션 데이터에 대한 "pull"과 "push" 접근을 제공합니다.
 
+모션 데이터에 "pull"하면 `CMMotionManager` 의 읽기 전용 속성 중 하나를 가져옵니다.
 
-Core Motion provides both "pull" and "push" access to motion data.
+"pushed" 데이터를 받으려면 업데이트를 받고 원하는 데이터에 대한 클로저를 생성해야 합니다.
 
-
-To "pull" motion data, you access the current reading from using one of the read-only properties of `CMMotionManager`.
-
-
-To receive "pushed" data, you start the collection of your desired data with a closure that receives updates at a specified interval.
-
-
-#### Starting Updates to "pull" Data
-
+#### "pull" 데이터 업데이트하기
 
 ```swift
 manager.startAccelerometerUpdates()
 ```
 
-
-After this call, `manager.accelerometerData` is accessible at any time with the device's current accelerometer data.
-
+위와 같이 호출 이후에 `manager.accelerometerData` 는 기기의 현재 가속도계 데이터이며 언제든지 접근할 수 있게됩니다.
 
 ```swift
 manager.accelerometerData
 ```
 
-
-You can also check whether motion data is available by reading the corresponding "is active" property.
-
+또한 "is active" 속성을 이용해서 지금 사용이 가능한지 확인할 수 있습니다.
 
 ```swift
 manager.isAccelerometerActive
 ```
 
-
-#### Starting Updates to "push" Data
-
+#### "push" 데이터 업데이트하기
 
 ```swift
 manager.startAccelerometerUpdates(to: .main) { (data, error) in
@@ -125,23 +94,16 @@ manager.startAccelerometerUpdates(to: .main) { (data, error) in
 }
 ```
 
+전달된 클로저는 업데이트 주기마다 호출됩니다.
+(실제로 Core Motion은 최소와 최대 주기를 강요하며 범위 바깥의 값을 지정하면 값이 조정될 수 있습니다. 모션 이벤트가 생성되는 시간을 확인해서 최적의 주기를 결정할 수도 있습니다.)
 
-The passed closure is called at the frequency provided by the update interval.
-(Actually, Core Motion enforces a minimum and maximum frequency,
-so specifying a value outside of that range causes that value to be normalized;
-you can determine the effective interval rate of the current device
-by checking the timestamps of motion events over time.)
-
-
-#### Stopping Updates
-
+#### 업데이트 멈추기
 
 ```swift
 manager.stopAccelerometerUpdates()
 ```
 
-
-## Accelerometer in Action
+## 가속도계 실제로 사용해보기
 
 
 Let's say we want to give the splash page of our app a fun effect, such that the background image remains level no matter how the phone is tilted.
