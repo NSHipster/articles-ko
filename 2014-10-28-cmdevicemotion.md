@@ -199,7 +199,7 @@ _잘 작동하네요!_
 
 ![Clunk to go back]({% asset cmdm-clunk.gif @path %})
 
-## 또 다른 기능 만들어보기
+## 또 다른 접근법 알아보기
 
 자이로스코프 데이터를 포함하면서 얻은 것은 더 나은 가속도계 데이터뿐만이 아닙니다.
 우리는 기기의 실제 방향도 알 수 있게 되었습니다.
@@ -225,65 +225,53 @@ _잘 작동하네요!_
 
 ### 오일러 각
 
+오일러 각은 기기의 자세를 표현하는 세 가지 방법 중 가장 읽기 좋은 형태를 가지고 있습니다. 앞에서 우리가 같이 알아봤던 각 축에 대한 회전을 간단하게 표시하기 때문입니다.
 
-Of the three attitude representations, Euler angles are the most readily understood, as they simply describe rotation around each of the axes we've already been working with.
+- `pitch` 는 X축의 회전을 의미합니다. 앞으로 기울이면 값이 증가하고 뒤로 기울이면 값이 감소합니다.
+- `roll` 은 Y축의 회전을 의미합니다. 오른쪽으로 돌리면 값이 증가하고 왼쪽으로 돌리면 값이 감소합니다.
+- `yaw` 는 Z축(수직)의 회전을 의미합니다. 반시계방향으로 돌리면 값이 증가하고 시계방향으로 돌리면 감소합니다.
 
+> 각각의 값은 "오른손 법칙"을 따릅니다. 손을 컵 모양으로 만들고 엄지를 세 축 중 원하는 축의 위쪽을 향합니다. 손끝이 향하는 곳이 증가하는 방향이고 그 반대가 감소하는 방향입니다.
 
-- `pitch` is rotation around the X-axis, increasing as the device tilts toward you, decreasing as it tilts away
-- `roll` is rotation around the Y-axis, decreasing as the device rotates to the left, increasing to the right
-- `yaw` is rotation around the (vertical) Z-axis, decreasing clockwise, increasing counter-clockwise.
+### 내 것으로 만들기
 
+마지막으로 기기의 자세를 사용해서 두 명이서 같이 공부할 수 있는 스피드 퀴즈 앱에 새로운 상호작용을 넣어봅시다.
+문제와 정답을 수동으로 변경하는 것 대신에 기기가 돌아갈 때 자동으로 문제와 정답을 변경하게 해보겠습니다. 그렇게 하면 문제를 내는 사람은 문제와 정답을 다 같이 보고 문제를 푸는 사람은 문제만 보게 될 것입니다.
 
-> Each of these values follows what's called the "right hand rule": make a cupped hand with your thumb pointing up and point your thumb in the direction of any of the three axes.
-> Turns that move toward your fingertips are positive, turns away are negative.
+문제와 정답의 변경을 위해 참조 프레임을 사용하는 것은 곤란할 수 있습니다. 어떤 각을 감시해야 할 지 알기 위해서 우리는 기기의 시작 위치(orientation)과 기기가 바라보고 있는 방향(direction)을 알아야합니다.
+이렇게 하는 것 대신에 `CMAttitude` 인스턴스를 저장하고 이를 "영점"으로 사용하겠습니다. 그리고 `multiply(byInverseOf:)` 메소드를 사용해서 미래에 생길 모든 자세 업데이트에 대해 오일러 각을 조정하겠습니다.
 
-
-### Keep It To Yourself
-
-
-Lastly, let's try using the device's attitude to enable a new interaction for a flash-card app designed to be used by two study buddies.
-Instead of manually switching between the prompt and the answer, we'll automatically flip the view as the device turns around, so the quizzer sees the answer while the person being quizzed sees only the prompt.
-
-
-Figuring out this switch from the reference frame would be tricky.
-To know which angles to monitor, we would somehow need to account for the starting orientation of the device and then determine which direction the device is pointing.
-Instead, we can save a `CMAttitude` instance and use it as the "zero point" for an adjusted set of Euler angles, calling the `multiply(byInverseOf:)` method to translate all future attitude updates.
-
-
-When the quizzer taps the button to begin the quiz, we first configure the interaction (note the "pull" of the deviceMotion for `initialAttitude`):
-
+문제 내는 사람이 퀴즈 버튼을 눌러서 시작할 때 우리는 기기의 시작점을 이용해 상호작용을 설정하겠습니다. (`initialAttitude` 의 deviceMotion의 "pull"을 기억하세요)
 
 ```swift
-// get magnitude of vector via Pythagorean theorem
+// Pythagorean 이론을 통해 규모를 알아냅니다
 func magnitude(from attitude: CMAttitude) -> Double {
     return sqrt(pow(attitude.roll, 2) +
             pow(attitude.yaw, 2) +
             pow(attitude.pitch, 2))
 }
 
-// initial configuration
+// 초기 설정
 var initialAttitude = manager.deviceMotion.attitude
 var showingPrompt = false
 
-// trigger values - a gap so there isn't a flicker zone
+// 트리거할 값을 지정합니다
 let showPromptTrigger = 1.0
 let showAnswerTrigger = 0.8
 ```
 
-
-Then, in our now familiar call to `startDeviceMotionUpdates`, we calculate the magnitude of the vector described by the three Euler angles and use that as a trigger to show or hide the prompt view:
-
+그 다음에 익숙한 `startDeviceMotionUpdates` 을 호출하고 오일러 각에서 설명된 벡터값의 규모를 계산합니다. 그리고 문제 화면을 보여줄지 말지를 트리거합니다.
 
 ```swift
 if manager.isDeviceMotionActive {
     manager.startDeviceMotionUpdates(to: .main) {
-        // translate the attitude
+        // attitude값 가져오기
         data.attitude.multiply(byInverseOf: initialAttitude)
 
-        // calculate magnitude of the change from our initial attitude
+        // 초기 attitude의 변화를 계산합니다
         let magnitude = magnitude(from: data.attitude) ?? 0
 
-        // show the prompt
+        // 문제를 보여줍니다
         if !showingPrompt && magnitude > showPromptTrigger {
             if let promptViewController =
                 self?.storyboard?.instantiateViewController(
@@ -298,7 +286,7 @@ if manager.isDeviceMotionActive {
             }
         }
 
-        // hide the prompt
+        // 문제를 숨깁니다
         if showingPrompt && magnitude < showAnswerTrigger {
             showingPrompt = false
             self?.dismiss(animated: true, completion: nil)
@@ -307,47 +295,36 @@ if manager.isDeviceMotionActive {
 }
 ```
 
-
-Having implemented all that, let's take a look at the interaction.
-As the device rotates, the display automatically switches views and the quizee never sees the answer:
-
+다 작성하셨다면 결과물을 확인해봅시다.
+기기가 회전될때마다 화면은 자동으로 변경되어서 문제 푸는 사람은 절대 정답을 볼 수 없게됩니다.
 
 ![Prompt by turning the device]({% asset cmdm-prompt.gif @path %})
 
+### 더 읽을거리
 
-### Further Reading
+저는 `CMAttitude` 의 [quaternion](https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation)과 [rotation matrix](https://en.wikipedia.org/wiki/Rotation_matrix) 컴포넌트를 건너뛰었지만 의도한 것은 아닙니다.
+특히 quaternion에는 [흥미로운 역사](https://en.wikipedia.org/wiki/History_of_quaternions)가 있고 생각하면 할수록 머리가 아프실 수도 있습니다.
 
+## 큐 잘 사용하기
 
-I skimmed over the [quaternion](https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation) and [rotation matrix](https://en.wikipedia.org/wiki/Rotation_matrix) components of `CMAttitude` earlier, but they are not without intrigue.
-The quaternion, in particular, has [an interesting history](https://en.wikipedia.org/wiki/History_of_quaternions), and will bake your noodle if you think about it long enough.
-
-
-## Queueing Up
-
-
-To keep the code examples readable, we've been sending all of our motion updates to the main queue.
-A better approach would be to schedule these updates on their own queue and dispatch back to main to update the UI.
-
+코드 예제를 더 읽기 쉽게 만들기 위해서 모션 업데이트들을 모두 메인 큐에 올렸었습니다.
+실제로 더 나은 접근법은 이 업데이트들을 각자의 큐에 올려두고 UI 업데이트시에만 메인 큐를 사용하는 것입니다.
 
 ```swift
 let queue = DispatchQueue(label: "motion")
 manager.startDeviceMotionUpdates(to: queue) {
     [weak self] (data, error) in
 
-    // motion processing here
+    // 여기서 모션 처리
 
     DispatchQueue.main.async {
-        // update UI here
+        // 여기서 UI 처리
     }
 }
 ```
 
 ---
 
+Core Motion으로 모든 상황에 맞는 상호작용을 만들 수는 없다는 사실을 알아주세요. 목적없는 애니메이션처럼 팬시한 제스쳐를 과하게 사용하는 것은 오히려 작은 화면에 집중하기 어려워집니다.
 
-Remember that not all interactions made possible by Core Motion are good ones.
-Navigation through motion can be fun, but it can also be hard to discover, easy to accidentally trigger, and may not be accessible to all users.
-Similar to purposeless animations, overuse of fancy gestures can make it harder to focus on the task at hand.
-
-
-Prudent developers will skip over gimmicks that distract and find ways to use device motion that enrich apps and delight users.
+신중한 개발자라면 앱을 풍부하게 만들고 사용자를 기쁘게하는 기기 모션을 적절하게 잘 사용할 것입니다.
