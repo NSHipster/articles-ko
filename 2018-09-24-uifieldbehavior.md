@@ -13,24 +13,17 @@ status:
   swift: 4.2
 ---
 
+지난 10년간 iOS에는 많은 것들이 생겼다가 사라졌습니다. 수공예품 같았던 처음과는 달리 이젠 많은 것들이 바뀌었습니다.
 
-The decade mark for iOS has come and gone. Once a nascent craft, iOS development today has a well-worn, broken-in feel to it.
+테이블뷰, 레이블, 버튼처럼 익숙한 영역 말고 다른 영역에 발을 딛는 순간 저는 걸림돌에 걸리는데 그럴때면 제가 간과하거나 완벽히 잊고 있던 Cocoa Touch의 영역이 있었다는 것을 깨닫게 해줍니다.
 
-
-And yet, when I step outside my comfort zone of table views, labels, buttons, and the like, I often find myself stumbling upon pieces of Cocoa Touch that I'd either overlooked or completely forgotten about.
-When I do, it's like picking an old book from a shelf;
-the anticipation of what might be tucked away in its pages invariably swells up within you.
-
-
-Recently, `UIFieldBehavior` has been my dust-covered tome sitting idly inside UIKit. An API built to model complex field physics for UI elements isn’t a typical use case, nor is it likely to be the hot topic among fellow engineers.
-But, when you need it, you _need_ it, and not much else will do. And as purveyors of the oft-forgotten or seldom used, it serves as an excellent topic for this week’s NSHipster article.
+`UIFieldBehavior` 는 먼지 쌓인 책의 일부분이었습니다. UI 요소에 대한 복잡한 필드 물리학을 모델링하기 위해 만들어진 API는 일반적인 사례가 아니며 동료 엔지니어들 사이에서 뜨거운 논점이 될 수도 있습니다. 이는 NSHipster의 글 주제가 되기에 아주 적합하다는 뜻이죠.
 
 ---
 
-
-With the design refresh of iOS in its 7th release, skeuomorphic design was famously sunset.
-In its place, a new paradigm emerged, in which UI controls were made to _feel_ like physical objects rather than simply look like them.
-New APIs would be needed to usher in this new era of UI design, and so we were introduced to [UIKit Dynamics](https://developer.apple.com/documentation/uikit/animation_and_haptics/uikit_dynamics).
+iOS 7에서 디자인 변경과 함께 스큐어모피즘 디자인은 일몰이 되었습니다.
+그 대신 새로운 패러다임이 생겨났습니다. UI 컨트롤은 실제처럼 보이기보다 물리적인 객체로 보이도록 만들어졌습니다.
+새로운 시대를 위한 새로운 API는 [UIKit Dynamics](https://developer.apple.com/documentation/uikit/animation_and_haptics/uikit_dynamics)에서 소개되었습니다.
 
 
 Examples of this reach out across the entire OS: the bouncy lock screen, the flickable photos, those oh-so-bubbly message bubbles --- these and many other interactions leverage some flavor of UIKit Dynamics (of which there are several).
