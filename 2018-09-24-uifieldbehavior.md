@@ -3,12 +3,8 @@ title: UIFieldBehavior
 author: Jordan Morgan
 category: Cocoa
 excerpt: >
-  With the design refresh of iOS in its 7th release,
-  skeuomorphic design was famously sunset.
-  In its place,
-  a new paradigm emerged,
-  in which UI controls were made to _feel_ like physical objects
-  rather than simply look like them.
+  iOS 7에서 디자인 변경과 함께 스큐어모피즘 디자인은 유명한 석양처럼 사라졌습니다.
+  그 대신 UI 컨트롤이 실제보다 물리적인 객체로 보이도록 만들어지는 새로운 패러다임이 생겨났습니다.
 status:
   swift: 4.2
 ---
@@ -21,8 +17,8 @@ status:
 
 ---
 
-iOS 7에서 디자인 변경과 함께 스큐어모피즘 디자인은 일몰이 되었습니다.
-그 대신 새로운 패러다임이 생겨났습니다. UI 컨트롤은 실제처럼 보이기보다 물리적인 객체로 보이도록 만들어졌습니다.
+iOS 7에서 디자인 변경과 함께 스큐어모피즘 디자인은 유명한 석양처럼 사라졌습니다.
+그 대신 UI 컨트롤이 실제보다 물리적인 객체로 보이도록 만들어지는 새로운 패러다임이 생겨났습니다.
 새로운 시대를 위한 새로운 API는 [UIKit Dynamics](https://developer.apple.com/documentation/uikit/animation_and_haptics/uikit_dynamics)에서 소개되었습니다.
 
 OS 전체에서 그 예를 찾을 수 있습니다. 톡톡 튀는 잠금 화면, 휙 볼 수 있는 사진, 버블버블 메세지 거품 등 이것들을 포함한 상호작용들은 UIKit Dynamics의 향이 납니다.
@@ -218,15 +214,9 @@ UIKit Dynamics는 물리학을 시뮬레이션합니다. 아주 잘이요.
 
 첫번째 이슈는 UIKit Dynamics의 가장 쉬운 행동 중 하나인 collision을 사용하면 아주 쉽게 해결할 수 있습니다. 스프링 필드가 작동되면 아바타 뷰가 어떻게 반응해야 하는지 더 잘 이해하기 위해 더 의도적으로 물리 속성을 설명해야 합니다. 이상적으로 우리는 중력과 마찰이 기세를 늦추기 위해 현실 세계에서와 같이 행동하기를 원합니다.
 
+어떤 경우에선 `UIDynamicItemBehavior` 는 이상적입니다. 이는 물리적인 특성을 물리 엔진과 상호작용하는 단순한 뷰 인스턴스로 연결할 수 있습니다. UIKit은 물리엔진과 상호작용할 때 이러한 속성들에 대해 각각 기본 값을 제공하고 있습니다. 그것들은 여러분의 경우에 맞춰져 있지 않을 것입니다. 그리고 UIKit Dynamics는 거의 매번 "특정 경우" 버킷에 포함됩니다.
 
-For such occasions, `UIDynamicItemBehavior` is ideal.
-It lets us attach physical properties to what would otherwise be mere abstract view instances interacting with a physics engine.
-Though UIKit does provide default values for each of these properties when interacting with the physics engine, they are likely not tuned to your specific use case.
-And UIKit Dynamics almost always falls into the "specific use case" bucket.
-
-
-It's not hard to foresee how the lack of such an API could quickly turn problematic.
-If we want to model things like a push, pull or velocity but have no way to specify the object's mass or density, we'd be omitting a critical piece of the puzzle.
+그러한 API 부족이 문제로 바뀔 수 있다고 예상하는 것은 그리 어렵지 않습니다. 밀거나 당기거나 속도와 같은 것을 모델링하고 싶지만 객체의 질량이나 밀도를 지정할 방법이 없다면 그것은 중요한 퍼즐 조각을 생략하는 것입니다.
 
 ```swift
 let avatarPhysicalProperties= UIDynamicItemBehavior(items: [facetimeAvatar])
@@ -242,23 +232,19 @@ avatarPhysicalProperties.resistance = 8;
 avatarPhysicalProperties.density = 0.02;
 ```
 
+이제 아바타 뷰는 현실 세계를 더 많이 반영해서 스프링 필드로 밀린 후 가볍게 느려지는 효과를 낼 것입니다. `UIDynamicItemBehavior` 가 이런 일이 가능하게 해주는 것은 정말 놀랍운 기능이며 마음에 들때까지 설정을 바꿀 수도 있습니다.
 
-Now the avatar view more closely mirrors real-world physics in that it slows down a tinge after pushed by a spring field.
-The configurations available from `UIDynamicItemBehavior` are impressive, as support for elasticity, charge and anchoring are also available to ensure you can continuing tweaking things until they feel right.
-
-
-Further, it also includes out-of-the-box support for attaching linear or angular velocity to an object.
-This serves as the perfect bookend to our journey with `UIDynamicItemBehavior`, as we probably want to give our FaceTime avatar a friendly nudge at the end of the gesture recognizer to send it off to its nearest corner, thus letting the relevant spring field take over:
+게다가 그것은 객체에 선형 속도 또는 각속도에 대한 지원을 포함하고 있습니다. 이것은 `UIDynamicItemBehavior` 는 FaceTime 아바타에게 제스처 인식기의 마지막에 친근한 넛지를 추가해서 가까운 모서리로 보내는 여정의 끝을 내는 역할을 할 것입니다.
 
 ```swift
-// Inside a switch for a gesture recognizer...
+// 제스처 인식기 안의 switch문의 내용입니다
 case .canceled, .ended:
 let velocity = panGesture.velocity(in: view)
 facetimeAvatarBehavior.addLinearVelocity(velocity, for: facetimeAvatar)
 ```
 
 ```objc
-// Inside a switch for a gesture recognizer...
+// 제스처 인식기 안의 switch문의 내용입니다
 case UIGestureRecognizerStateCancelled:
 case UIGestureRecognizerStateEnded:
 {
@@ -268,16 +254,11 @@ break;
 }
 ```
 
+가짜 FaceTime UI를 만드는 것도 거의 다 끝났습니다!
 
-We're almost finished creating our faux FaceTime UI.
+모든 경험을 다같이 겪기 위해서 우리는 FaceTime 아바타가 animator의 뷰의 코너에 닿았을 때 어떤 행동을 해야하는지 알아야합니다. 우리는 그것이 계속 화면 안에 있기를 원합니다. UIKit Dynamics는 이러한 상황을 위해 `UICollisionBehavior` 를 제공합니다.
 
-
-To pull the entire experience together, we need to account for what our FaceTime avatar should do when it reaches the corners of the animator's view.
-We want it to stay contained within it, and currently, nothing is keeping it from flying off the screen.
-UIKit Dynamics offers us such behavior to account for these situations by way of `UICollisionBehavior`.
-
-
-Creating a collision follows a similar pattern as with using any other UIKit Dynamics behavior, thanks to consistent API design:
+일관성있는 API 디자인덕분에 우리는 collision을 생성할 때도 다른 UIKit Dynamics 행동과 비슷한 패턴으로 생성할 수 있습니다.
 
 ```swift
 let parentViewBoundsCollision = UICollisionBehavior(items: [facetimeAvatar])
@@ -289,10 +270,7 @@ UICollisionBehavior *parentViewBoundsCollision = [[UICollisionBehavior alloc] in
 parentViewBoundsCollision.translatesReferenceBoundsIntoBoundary = YES;
 ```
 
-
-Take note of `translatesReferenceBoundsIntoBoundary`.
-When `true`, it treats our animator view's bounds as its collision boundaries.
-Recall that this was our initial step in setting up our dynamics stack:
+`translatesReferenceBoundsIntoBoundary` 를 주목하세요. 이것의 값이 `true` 라면 우리의 animator 뷰의 바운드를 collision의 경계로 취급할 것입니다.
 
 ```swift
 lazy var animator:UIDynamicAnimator = {
@@ -304,31 +282,25 @@ lazy var animator:UIDynamicAnimator = {
 self.animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.view];
 ```
 
-By aggregating several behaviors to work as one, we can now bask in our work:
+여러가지 행동을 하나로 모았으니 이제 즐길 일만 남았습니다.
 
 <video preload="none" src="{% asset uifieldbehavior-demo.mp4 @path %}" poster="{% asset uifieldbehavior-demo.png @path %}" width="320" controls></video>
 
 <br/>
 
-
-If you want to stray from the FaceTime "sticky" corners, you are in an ideal position to do so.
-`UIFieldBehavior` has many more field physics to offer other than just a spring.
-You could experiment by replacing it with a magnetism effect, or constantly have the avatar rotate around a given point.
+FaceTime의 "끈적한" 코너에서 벗어나고 싶다면 이상적인 태도입니다.
+`UIFieldBehavior` 는 스프링말고도 많은 필드 물리학을 가지고 있습니다.
+우리는 이를 자석 효과로 변경하거나 계속 회전하게 만들수도 있습니다.
 
 ---
 
+iOS는 많은 스큐어모피즘을 겪어와서 사용자 경험에선 먼 길을 걸어왔습니다.
+우리는 더 이상 Game Center에 어떤 게임이 있는지 알고 그것을 관리하기 위해 [초록색 펠트]({% asset game-center-felt.jpg @path %})를 필요로 하지 않습니다.
 
-iOS has largely parted ways with skeuomorphism, and user experience has come a long way as a result.
-We no longer necessarily require [green felt]({% asset game-center-felt.jpg @path %}) to know that Game Center represents games and how we can manage them.
+대신에 UIKit Dynamics는 사용자에게 완전히 새로운 방식의 상호작용을 소개합니다.
+UI 컴포넌트를 현실 세계처럼 보이게 만드는 것은 사용자 경험이 2007년 이후로 얼마나 많이 발전했는지를 보여주는 좋은 예입니다.
 
+OS 전반에 그러한 레이어가 벗겨지면서 UIKit Dynamics가 시각적 요소들이 우리의 행동에 어떤 반응을 해야하는지에 연결하는 문이 열렸습니다. 이러한 작은 연결은 처음 봤을 땐 그렇게 중요하지 않아 보일 수 있지만 시간이 지날수록 그렇지 않다는 것을 알게 될 것입니다.
 
-Instead, UIKit Dynamics introduces an entirely new way for users to interact and connect with iOS.
-Making UI components behave as they do in the real world instead of simply looking like them is a good illustration of how far user experience has evolved since 2007.
-
-
-Stripping away this layer across the OS opened the door for UIKit Dynamics to connect our expectations of how visual elements should react to our actions.
-These little connections may seem inconsequential at first glance, but take them away, and you'll likely start to realize that things would feel "off."
-
-
-UIKit Dynamics offers up many flavors of physical behaviors to leverage, and its field behaviors are perhaps some of the most interesting and versatile.
-The next time you see an opportunity to create a connection in your app, `UIFieldBehavior` might give you the start you need.
+UIKit Dynamics는 실제로 사용할 수 있는 여러가지 실제 동작을 제공하며 필드 행동들은 정말 흥미롭고 다양합니다.
+다음에 앱에서 기회가 생긴다면 `UIFieldBehavior` 로 시작하는 것은 어떨까요?
