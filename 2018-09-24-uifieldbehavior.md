@@ -167,17 +167,12 @@ topLeftCornerField.region = [[UIRegion alloc] initWithSize:CGSizeMake(self.bound
 
 ## 물리학 디버깅하기
 
-
+보이지 않는 힘과 상호작용하는 것의 개념을 익히는 것은 쉬운 일이 아닙니다. 고맙게도 Apple은 이러한 문제를 예상했고 이를 풀기위한 격이 다른 방법들을 제공합니다.
 It's not easy to conceptualize the interactions of invisible field forces.
-Thankfully, Apple anticipated as much and provides a somewhat out-of-the-box way to solve this problem.
 
+`UIDynamicAnimator` 의 숨은 불리언 속성인 `debugEnabled` 입니다. 이를 `true` 로 설정하는 것은 필드 기반 효과들과 그것들이 영향을 끼치는 곳들을 빨간 줄로 시각화 해줍니다. 이는 계속 작업하는데 있어서 아주 좋은 동반자가 될 것입니다.
 
-Tucked away inside of `UIDynamicAnimator` is a Boolean property, `debugEnabled`.
-Setting it to `true` paints the interface with red lines to visualize field-based effects and their influence.
-This can go quite a long way to help you make sense of how their dynamics are working.
-
-
-This API isn't exposed publicly, but you can unlock its potential through a category or using key-value coding:
+이 API는 공개적으로 알려지진 않았지만 키밸류 코딩이나 카테고리를 사용해서 잠금 해제 할 수 있습니다.
 
 ```objc
 @import UIKit;
@@ -191,7 +186,7 @@ This API isn't exposed publicly, but you can unlock its potential through a cate
 #endif
 ```
 
-or
+또는
 
 ```swift
 animator.setValue(true, forKey: "debugEnabled")
@@ -201,40 +196,27 @@ animator.setValue(true, forKey: "debugEnabled")
 [self.animator setValue:@1 forKey:@"debugEnabled"];
 ```
 
+카테고리를 생성하는 것은 귀찮은 일이지만 더 안전한 옵션인 것은 변함 없습니다.
+키밸류 코딩이 안전하지 않은 이유는 미래의 iOS에서 그 키가 쓰일 수 있기 때문입니다. 그것만 아니면 사용하기도 편해서 사용하기 좋습니다.
 
-Although creating a category involves a bit more legwork, it's the safer option.
-The slippery slope of key-value coding can rear its exception-laden head with any iOS release in the future, as the price of convenience is typically anything but free.
-
-
-With debugging enabled, it appears as though each corner has a spring effect attached to it.
-Running and using our fledgling app, however, reveals that it's not enough to complete the effect we're seeking.
-
+디버깅 설정을 켜면 어떤 코너가 스프링 효과를 가지고 있는지도 보여줍니다. 그러나 우리의 풋내기 앱을 실행해보면 우리가 찾고 있는 효과를 완전하게 소화하고 있지 않다는 것을 알 수 있습니다.
 
 {% asset uidynamicanimator-debug.jpg %}
 
+## 행동 정리하기 (Aggregating Behaviors)
 
-## Aggregating Behaviors
+필드 물리학에 대해 더 깊이 이해하기 위해 현재 상황을 살펴보겠습니다.
+지금 우리가 가지고 있는 문제는 다음과 같습니다.
 
+1. 아바타는 스프링 필드가 아니면 아무것도 유지하지 않고 화면에서 벗어날 수 있어야 합니다.
+2. 원형으로 회전하고 있습니다.
+3. 또 아주 느립니다.
 
-Let's take stock of our current situation to deepen our understanding of field physics.
-Currently, we've got a few issues:
+UIKit Dynamics는 물리학을 시뮬레이션합니다. 아주 잘이요.
 
+다행히도 이러한 바람직하지 않은 부작용을 모두 완화시킬 수 있습니다. 위트있게 말하자면 사소하지만 왜 그것이 핵심인지에 대한 이유입니다.
 
-1. The avatar could fly off the screen with nothing to keep it constrained aside from spring fields
-2. It has a knack for rotating in circles.
-3. Also, it's a tad slow.
-
-
-UIKit Dynamics simulates physics --- perhaps too well.
-
-
-Fortunately, we can mitigate all of these undesirable side effects.
-To wit, they are rather trivial fixes, but it's the _reason_ why they're needed that's key.
-
-
-The first issue is solved in a rather trivial fashion with what is likely UIKit Dynamics most easily understood behavior: the collision.
-To better hone in on how the avatar view should react once it's acted upon by a spring field, we need to describe its physical properties in a more intentional manner.
-Ideally, we'd want it to behave like it would in real life, with gravity and friction acting to slow down its momentum.
+첫번째 이슈는 UIKit Dynamics의 가장 쉬운 행동 중 하나인 collision을 사용하면 아주 쉽게 해결할 수 있습니다. 스프링 필드가 작동되면 아바타 뷰가 어떻게 반응해야 하는지 더 잘 이해하기 위해 더 의도적으로 물리 속성을 설명해야 합니다. 이상적으로 우리는 중력과 마찰이 기세를 늦추기 위해 현실 세계에서와 같이 행동하기를 원합니다.
 
 
 For such occasions, `UIDynamicItemBehavior` is ideal.
