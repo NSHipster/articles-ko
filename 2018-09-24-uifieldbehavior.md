@@ -25,36 +25,26 @@ iOS 7에서 디자인 변경과 함께 스큐어모피즘 디자인은 일몰이
 그 대신 새로운 패러다임이 생겨났습니다. UI 컨트롤은 실제처럼 보이기보다 물리적인 객체로 보이도록 만들어졌습니다.
 새로운 시대를 위한 새로운 API는 [UIKit Dynamics](https://developer.apple.com/documentation/uikit/animation_and_haptics/uikit_dynamics)에서 소개되었습니다.
 
+OS 전체에서 그 예를 찾을 수 있습니다. 톡톡 튀는 잠금 화면, 휙 볼 수 있는 사진, 버블버블 메세지 거품 등 이것들을 포함한 상호작용들은 UIKit Dynamics의 향이 납니다.
 
-Examples of this reach out across the entire OS: the bouncy lock screen, the flickable photos, those oh-so-bubbly message bubbles --- these and many other interactions leverage some flavor of UIKit Dynamics (of which there are several).
+- `UIAttachmentBehavior`: 두 아이템이나 아이템과 주어진 anchor point와의 관계를 생성합니다.
+- `UICollisionBehavior`: 하나 이상의 객체가 서로 덮어씌우는 것 대신에 튕겨나가도록 하는 상호작용입니다.
+- `UIFieldBehavior`: 필드 기반 물리학을 아이템이나 공간에 적용합니다.
+- `UIGravityBehavior`: 중력(아래로) 또는 위로 뜨도록 합니다.
+- `UIPushBehavior`: 즉각적이거나 지속적인 힘을 생성합니다.
+- `UISnapBehavior`: 지속적으로 꺾는 모션을 생성합니다.
 
-
-- `UIAttachmentBehavior`: Creates a relationship between two items, or an item and a given anchor point.
-- `UICollisionBehavior`: Causes one or more objects to bounce off of one another instead of overlapping without interaction.
-- `UIFieldBehavior`: Enables an area or item to participate in field-based physics.
-- `UIGravityBehavior`: Applies a gravitational force, or pull.
-- `UIPushBehavior`: Creates an instantaneous or continuous force.
-- `UISnapBehavior`: Produces a motion that dampens over time.
-
-
-For this article, let's take a look at `UIFieldBehavior`, which our good friends in Cupertino used to build the PiP functionality seen in FaceTime calls.
-
+이 글에선 FaceTime에서 PiP 기능을 만들 때 사용한 Cupertino의 좋은 친구인 `UIFieldBehavior` 에 대해 알아보도록 하겠습니다.
 
 {% asset facetime-picture-in-picture.png alt="FaceTime" title="Image: Apple Inc. All Rights reserved." %}
 
+## Field Behavior 이해하기
 
-## Understanding Field Behaviors
+Apple은 `UIFieldBehavior` 가 "필드 기반" 물리학을 적용한다고 언급헀지만 정확히 그게 무슨 뜻일까요? 감사히도 그것은 우리가 생각하는 것과 매우 비슷합니다.
 
+자석의 당김이나 스프링의 띠용(sproing)이나 우리를 아래로 누르는 지구의 중력처럼 현실 세계에는 필드 기반 물리학의 예제가 수없이 많습니다. `UIFieldBehavior` 를 사용하면 뷰의 공간을 조정해서 아이템이 언제든 그 공간에 들어와도 특정 물리 효과를 적용할 수 있게 됩니다.
 
-Apple mentions that `UIFieldBehavior` applies "field-based" physics, but what does that mean, exactly?
-Thankfully, it's more relatable that one might think.
-
-
-There are plenty of examples of field-based physics in the real world, whether it's the pull of a magnet, the \*sproing\* of a spring, the force of gravity pulling you down to earth.
-Using `UIFieldBehavior`, we can designate areas of our view to apply certain physics effects whenever an item enters into them.
-
-
-Its approachable API design allows us to complex physics without much more than a factory method:
+API 디자인이 접근하기 쉽게 만들어졌기 때문에 복잡한 물리학이라도 팩토리 메소드에 불과하게 됩니다.
 
 ```swift
 let drag = UIFieldBehavior.dragField()
@@ -64,8 +54,7 @@ let drag = UIFieldBehavior.dragField()
 UIFieldBehavior *drag = [UIFieldBehavior dragField];
 ```
 
-
-Once we have a field force at our disposal, it's a matter of placing it on the screen and defining its area of influence.
+우리가 다룰 수 있는 공간을 갖게 되면 화면에 배치하고 영향을 끼칠 영역을 정의해야 합니다.
 
 ```swift
 drag.position = view.center
@@ -77,19 +66,16 @@ drag.position = self.view.center;
 drag.region = [[UIRegion alloc] initWithSize:self.view.bounds.size];
 ```
 
-
-If you need more granular control over a field's behavior, you can configure its `strength` and `falloff`, as well as any additional properties specific to that field type.
+필드의 행동을 넘어서 더 세분화된 조정이 필요하다면 `strength` 와 `falloff` 를 설정할 수 있습니다. 이를 사용하면 필드 타입에 추가적인 속성을 설정할 수 있습니다.
 
 ---
 
+모든 UIKit Dynamics의 행동들은 영향을 끼치기 전에 약간의 설정이 필요하고 `UIFieldBehavior` 도 예외는 없습니다. 플로우는 다음과 같습니다.
 
-All UIKit Dynamics behaviors require some setup to take effect, and `UIFieldBehavior` is no exception. The flow looks generally something like this:
-
-
-- Create an instance of a `UIDynamicAnimator` to provide the context for any animations affecting its dynamic items.
-- Initialize the desired behaviors to use.
-- Add the views you wish to be involved with each behavior.
-- Add those behaviors to the dynamic animator from step one.
+- `UIDynamicAnimator` 의 인스턴스를 만들어서 다이나믹 아이템에 적용될 애니메이션의 컨텍스트를 제공합니다.
+- 사용하고자 하는 행동으로 초기화합니다.
+- 각 행동이 적용될 뷰를 추가합니다.
+- 그 행동들을 처음 만들었던 dynamic animator에 추가합니다.
 
 ```swift
 lazy var animator:UIDynamicAnimator = {
@@ -117,50 +103,32 @@ self.drag = [UIFieldBehavior dragField];
 
 {% warning do %}
 
-Take care to keep a strong reference to you `UIKitDynamicAnimator` object.
-You don't typically need to do this for behaviors because the animator takes ownership to a behavior once it's added.
+`UIKitDynamicAnimator` 객체에 강한 참조를 유지하는 것을 관리해주세요. animator는 행동이 추가되면 오너쉽을 가져서 보통 꼭 할 필요는 없습니다.
 
 {% endwarning %}
 
 
-For a _bona fide_ example of `UIFieldBehavior`, let's take a look at how FaceTime leverages it to make the small rectangular view of the front-facing camera stick to each corner of the view's bounds.
+`UIFieldBehavior` 의 _bona fide_ 를 살펴보겠습니다. FaceTime은 어떻게 정면 카메라의 작은 직사각형 뷰를 화면의 경계에 붙일 수 있을까요?
 
+## Spring Field로 만든 Face to Face
 
-## Face to Face with Spring Fields
+FaceTime을 하는 동안 우리는 픽쳐-인-픽쳐를 화면의 네 구석 중 하나에 옮길 수 있습니다. 어떻게 이렇게 유동적이면서 딱 붙어있도록 만들 수 있을까요?
 
+한 가지 접근법은 제스처 인식기의 끝 상태를 확인하고 어떤 코너에 붙을 지 계산하며 필수적으로 애니메이션까지 하는 것입니다. 이 방법의 문제는 아바타가 코너에 옮겨질때마다 보간(interpolation)과 축임(dampening) 같은 상호작용 때문에 Apple이 고심해서 넣은 "비밀 소스"를 잃을 가능성이 있다는 것입니다.
 
-During a FaceTime call, you can flick your picture-in-picture to one of the corners of the screen.
-How do we get it to move fluidly but still stick?
+이는 `UIFieldBehavior` 의 스프링 필드에서 있는 교과서적인 상황입니다. 말그대로 스프링이 작동하는 방식에 대해 생각한다면 원래 자리로 돌아오도록 선형적인 힘을 동등하게 줄 것입니다. 코일형 스프링을 아래로 당기면 원래 자리로 돌아가려는 것을 생각하면 됩니다.
 
+이것은 스프링 필드가 우리의 UI에도 도움을 줄 수 있는 이유가 됩니다. 복싱 링에서 누군가 밖으로 나가려고 하면 다시 튕겨서 들어오는 상황을 생각하면 됩니다.
 
-One approach might entail checking a gesture recognizer's end state, calculating which corner to settle into, and animating as necessary.
-The problem here is that we likely would lose the "secret sauce" that Apple painstakingly applies to these little interactions, such as the interpolation and dampening that occurs as the avatar settles into a corner.
-
-
-This is a textbook situation for `UIFieldBehavior`'s spring field.
-If we think about how a literal spring works, it exerts a linear force equal to the amount of strain that's put on it.
-So, if we push down on a coiled spring we expect it to snap back into place once we let go.
-
-
-This is also why spring fields can help contain items within a particular part of your UI.
-You could think of a boxing ring and how its elastic rope keeps contestants within the ring.
-With springs, though, the rope would originate from the center of the ring and be pulled back to each edge.
-
-
-A spring field works a lot like this.
-Imagine if our view's bounds were divided into four rectangles, and we had these springs hanging out around the edges of each one.
-The springs would be "pushed" down from the center of the rectangle to the edge of its corner.
-When the avatar enters any of the corners, the spring is "let go" and gives us that nice little push that we're after.
-
+스프링 필드도 이것과 매우 비슷하게 작동합니다. 뷰가 네 영역으로 나눠져서 스프링이 각 영역에 달려있다고 상상해보세요. 그 스프링들은 사각형의 가운데에서 코너로 당길 것입니다.
 
 {% info do %}
 
-The spring field is created by replicating [Hooke's Law](https://phys.org/news/2015-02-law.html) to calculate how much force should be applied to the objects within the field.
+스프링 필드는 [Hooke's Law](https://phys.org/news/2015-02-law.html)를 복제해서 필드 안에서 객체에게 얼마만큼의 힘이 적용되는지 계산하기 위해서 만들어졌습니다.
 
 {% endinfo %}
 
-
-To take care of the avatar settling into each corner, we can do something clever like this:
+우리는 다음과 같이 똑똑하게 아바타 세팅을 관리할 수 있습니다.
 
 ```swift
 let scale = CGAffineTransform(scaleX: 0.5, y: 0.5)
@@ -187,18 +155,17 @@ for vertical in [\UIEdgeInsets.left,
 ```objc
 UIFieldBehavior *topLeftCornerField = [UIFieldBehavior springField];
 
-// Top left corner
+// 왼쪽 위 코너
 topLeftCornerField.position = CGPointMake(self.layoutMargins.left, self.layoutMargins.top);
 topLeftCornerField.region = [[UIRegion alloc] initWithSize:CGSizeMake(self.bounds.size.width/2, self.bounds.size.height/2)];
 
 [self.animator addBehavior:topLeftCornerField];
 [self.topLeftCornerField addItem:self.facetimeAvatar];
 
-// Continue to create a spring field for each corner...
+// 각 코너에 대한 스프링 필드를 계속 생성하면 됩니다
 ```
 
-
-## Debugging Physics
+## 물리학 디버깅하기
 
 
 It's not easy to conceptualize the interactions of invisible field forces.
