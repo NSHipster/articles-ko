@@ -1,6 +1,7 @@
 ---
 title: UIFieldBehavior
 author: Jordan Morgan
+translator: 김필권
 category: Cocoa
 excerpt: >
   iOS 7에서 디자인 변경과 함께 스큐어모피즘 디자인은 유명한 석양처럼 사라졌습니다.
