@@ -13,90 +13,72 @@ status:
   swift: 4.2
 ---
 
+다크 모드는 macOS의 가장 유명한 에디션 중 하나입니다. 특히 우리처럼 텍스트 에디터에서 검은 배경에 밝은 색상 테마를 사용하는 개발자들에겐 이 새로운 시각적인 일관성을 유지하게 해주는 기능은 감사할 따름입니다.
 
-Dark Mode is one of the most popular additions to macOS --- especially among us developer types, who tend towards light-on-dark color themes in text editors and appreciate this new visual consistency across the system.
+몇 년 전엔 어떤 팬이 Night Shift와 비슷하고 늦은 밤에 (또는 이른 아침) 개발하는 사람들의 눈의 피로를 줄여주는 기능을 만들기도 했습니다.
 
-
-A couple of years back, there was similar fanfare for Night Shift, which helped to reduce eye strain from hacking late into the night (or early in the morning, as it were).
-
-
-If you triangulate from those two macOS features, you get Dynamic Desktops, also new in Mojave.
-Now when you go to "System Preferences > Desktop & Screen Saver", you have the option to select a "Dynamic" desktop picture that changes throughout the day, based on your location.
+두 macOS 기능을 삼각 측량해보면 이번 Mojave에서 새로 나온 Dynamic Desktops로 귀결될 것입니다.
+"시스템 환경설정 > 데스크탑 및 화면 보호기"에 가면 새로운 선택지인 "다이내믹"을 볼 수 있을 것입니다. 이 기능은 여러분의 위치와 시간에 따라 배경화면이 변하는 기능입니다.
 
 {% asset desktop-and-screen-saver-preference-pane.png %}
 
+결과는 감지하기 힘들지만 시간이 지나서 확인해보면 기분이 좋아집니다.
+시간에 따라 배경화면을 보고있으면 자연과 조화돼서 마치 배경화면이 살아있는 것 같습니다.
 
-The result is subtle and delightful.
-Having a background that tracks the passage of time makes the desktop feel alive; in tune with the natural world.
-(If nothing else, it makes for a lovely visual effect when switching dark mode on and off)
+_내부에선 정확히 어떤 일이 일어나는걸까요?_<br/>
+그게 바로 이번주의 NSHipster의 주제입니다.
 
-
-_But how does it work, exactly?_<br/>
-That's the question for this week's NSHipster article.
-
-
-The answer involves a deep dive into image formats, a little bit of reverse-engineering and even some spherical trigonometry.
+그에 대한 대답을 하기 위해 우리는 이미지 포맷을 깊숙히 파보며 약간의 리버스 엔지니어링과 구형 삼각법도 알아볼 것입니다.
 
 ---
 
+Dynamic Desktop이 어떻게 작동하는지 이해하기 위한 가장 첫 번째는 다이내믹 이미지를 알아보는 것입니다.
 
-The first step to understanding how Dynamic Desktop works is to get hold of a dynamic image.
-
-
-If you're running macOS Mojave open Finder, select "Go > Go to Folder..." (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>G</kbd>), and enter "/Library/Desktop Pictures/".
+macOS Mojave를 설치하셨다면 파인더를 열고 "이동 > 폴더로 이동"(<kbd>⇧</kbd><kbd>⌘</kbd><kbd>G</kbd>)을 선택하시고 "/Library/Desktop Pictures/"를 입력하세요.
 
 {% asset go-to-library-desktop-pictures.png %}
 
-
-In this directory, you should find a file named "Mojave.heic".
-Double-click it to open it in Preview.
+이 폴더안에 있는 "Mojave.heic" 파일을 찾으시고 미리보기 앱으로 열어보세요.
 
 {% asset mojave-heic.png %}
 
-
-In Preview, the sidebar shows a list of thumbnails numbered 1 through 16, each showing a different view of the desert scene.
+미리보기의 사이드 바를 보면 각자 사막의 다른 화면을 나타내고 있는 16개의 썸네일을 확인할 수 있을 것입니다.
 
 {% asset mojave-dynamic-desktop-images.png %}
 
-
-If we select "Tools > Show Inspector" (<kbd>⌘</kbd><kbd>I</kbd>), we get some general information about what we're looking at:
+이제 "도구 > 속성 보기" (<kbd>⌘</kbd><kbd>I</kbd>) 를 선택하면 우리가 찾던 일반적인 정보를 볼 수 있습니다.
 
 {% asset mojave-heic-preview-info.png %}
 
-
-Unfortunately, that's about all Preview gives us (at least at the time of writing).
-If we click on the next panel over, "More Info Inspector", we don't learn a whole lot more about our subject:
+아쉽게도 이게 미리보기가 우리에게 제공할 수 있는 모든 정보입니다. (지금 이 글을 적고있는 지금까지는요.)
+다음 패널인 "추가 정보"를 선택하면 우리의 주제에 대한 더 많은 정보를 얻을 수 있습니다.
 
 |              |            |
 | ------------ | ---------- |
-| Color Model  | RGB        |
-| Depth:       | 8          |
-| Pixel Height | 2,880      |
-| Pixel Width  | 5,120      |
-| Profile Name | Display P3 |
+| Color Model (색상 모델)  | RGB        |
+| Depth (심도)  | 8          |
+| Pixel Height (픽셀 높이) | 2,880      |
+| Pixel Width (픽셀 너비) | 5,120      |
+| Profile Name (프로파일 이름) | Display P3 |
 
 {% info %}
 
-The `.heic` file extension corresponds to image containers encoded using the <abbr title="High-Efficiency Image File Format">HEIF</abbr>, or High-Efficiency Image File Format (which is itself based on <abbr title="High-Efficiency Video Compression">HEVC</abbr>, or High-Efficiency Video Compression --- also known as H.265 video).
-For more information, check out [WWDC 2017 Session 503 "Introducing HEIF and HEVC"](https://developer.apple.com/videos/play/wwdc2017/503/)
+`.heic` 파일 확장자는 <abbr title="High-Efficiency Image File Format">HEIF</abbr> 또는 <abbr title="High-Efficiency Video Compression">HEVC</abbr>를 사용해서 인코딩된 이미지들의 컨테이너를 의미합니다. 더 많은 정보는 [WWDC 2017 Session 503 "HEIF와 HEVC를 소개합니다"](https://developer.apple.com/videos/play/wwdc2017/503/)를 참고하세요.
 
 {% endinfo %}
 
+우리는 더 자세히 알고싶기 때문에 소매를 걷고 더 낮은 단계의 API로 들어가봅시다.
 
-If we want to learn more, we'll need to roll up our sleeves and get our hands dirty with some low-level APIs.
+## CoreGraphics로 더 자세히 파헤치기
 
-
-## Digging Deeper with CoreGraphics
-
-
-Let's start our investigation by creating a new Xcode Playground.
-For simplicity, we can hard-code a URL to the "Mojave.heic" file on our system.
+새로운 Xcode Playground를 생성해서 조사를 시작해보겠습니다.
+간편함을 위해 시스템의 "Mojave.heic" 파일의 URL을 하드코딩하겠습니다.
 
 ```swift
 import Foundation
 import CoreGraphics
 
-// macOS 10.14 Mojave Required
+// macOS 10.14 Mojave가 필요합니다
 let url = URL(fileURLWithPath: "/Library/Desktop Pictures/Mojave.heic")
 ```
 
