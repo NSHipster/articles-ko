@@ -4,16 +4,13 @@ author: Mattt
 translator: 김필권
 category: ""
 excerpt: >
-  Dark Mode is one of the most popular additions to macOS ---
-  especially among us developer types.
-  If you triangulate between that and Night Shift,
-  introduced a couple of years prior,
-  you get the Dynamic Desktop feature, new in Mojave.
+  다크 모드는 macOS Mojave의 가장 유명한 기능 중 하나입니다. 특히 우리 개발자들에게는요.
+  이 기능과 Night Shift를 통해 유추해본다면 Dynamic Desktop은 충분히 나올 수 있는 기능이었습니다.
 status:
   swift: 4.2
 ---
 
-다크 모드는 macOS의 가장 유명한 에디션 중 하나입니다. 특히 우리처럼 텍스트 에디터에서 검은 배경에 밝은 색상 테마를 사용하는 개발자들에겐 이 새로운 시각적인 일관성을 유지하게 해주는 기능은 감사할 따름입니다.
+다크 모드는 macOS Mojave의 가장 유명한 기능 중 하나입니다. 특히 우리 개발자들에게는요.
 
 몇 년 전엔 어떤 팬이 Night Shift와 비슷하고 늦은 밤에 (또는 이른 아침) 개발하는 사람들의 눈의 피로를 줄여주는 기능을 만들기도 했습니다.
 
