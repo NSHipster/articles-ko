@@ -82,8 +82,7 @@ import CoreGraphics
 let url = URL(fileURLWithPath: "/Library/Desktop Pictures/Mojave.heic")
 ```
 
-
-Next, create a `CGImageSource`, copy its metadata, and enumerate over each of its tags:
+다음은 `CGImageSource` 를 만들고 메타데이터를 복사해서 모든 태그들을 둘러보겠습니다.
 
 ```swift
 let source = CGImageSourceCreateWithURL(url as CFURL, nil)!
@@ -100,8 +99,7 @@ for tag in tags {
 }
 ```
 
-
-When we run this code, we get two results: `hasXMP`, which has a value of `"True"`, and `solar`, which has a decidedly less understandable value:
+위의 코드를 실행하면 두 가지 결과를 얻을 수 있습니다. `"True"` 값을 가지는 `hasXMP` 와 조금은 이해하기 힘든 값을 가지는 `solar` 입니다.
 
 ```
 YnBsaXN0MDDRAQJSc2mvEBADDBAUGBwgJCgsMDQ4PEFF1AQFBgcICQoLUWlRelFh
@@ -121,14 +119,11 @@ kAGSAZsBpAGtAa8BuAHBAcMBzAHOAdcB4AHpAesB9AAAAAAAAAIBAAAAAAAAAEkA
 AAAAAAAAAAAAAAAAAAH9
 ```
 
+### 태양계의 빛나는 태양
 
-### Shining Light on Solar
+대부분의 우리는 이 알 수 없는 글자의 벽을 보고선 조용히 맥북을 닫았을 것입니다. 하지만 몇 분은 아셨을 사실인데 이 텍스트는 [Base64-encoded](https://en.wikipedia.org/wiki/Base64)로 암호화된 것과 아주 비슷하게 생겼습니다.
 
-Most of us would look at that wall of text and quietly close the lid of our MacBook Pro.
-But, as some of you surely noticed, this text looks an awful lot like it's [Base64-encoded](https://en.wikipedia.org/wiki/Base64).
-
-
-Let's test out our hypothesis in code:
+우리의 가설을 실행에 옮길 시간입니다.
 
 ```swift
 if name == "solar" {
@@ -141,15 +136,11 @@ if name == "solar" {
 bplist00Ò\u{01}\u{02}\u{03}...
 </samp>
 
+`bplist` 가 뭘까요?
 
-What's that?
-`bplist`, followed by a bunch of garbled nonsense?
+놀랍게도 이건 [바이너리 프로퍼티 리스트](https://en.wikipedia.org/wiki/Property_list)의 [파일 서명](https://en.wikipedia.org/wiki/File_format#Magic_number)입니다.
 
-
-By golly, that's the [file signature](https://en.wikipedia.org/wiki/File_format#Magic_number) for a [binary property list](https://en.wikipedia.org/wiki/Property_list).
-
-
-Let's see if `PropertyListSerialization` can make any sense of it...
+이번엔 `PropertyListSerialization` 를 사용해보겠습니다...
 
 ```swift
 if name == "solar" {
@@ -184,34 +175,24 @@ if name == "solar" {
 )
 ```
 
+_이제야 말이 통하네요!_
 
-_Now we're talking!_
+최상위 키는 두 가지입니다.
 
+`ap` 키는 정수값을 가지는 `d` 와 `l` 키를 가지는 딕셔너리를 값으로 가지고 있습니다.
 
-We have two top-level keys:
+`si` 키는 정수와 실수 값을 가지는 딕셔너리의 배열을 값으로 가집니다.
+중첩된 딕셔너리들의 키를 살펴보겠습니다. `i` 는 딱 보면 알 수 있듯이 0에서 15로 증가하는 인덱스 값입니다.
+`a` 와 `z` 는 다른 정보 없이는 추측하기가 어렵습니다. 하지만 고도(altitude)와 방위각(azimuth)를 생각하시면 쉽습니다.
 
+### 태양의 위치 계산하기
 
-The `ap` key corresponds to a dictionary containing integers for the `d` and `l` keys.
+이 글을 쓰고 있는 시점엔 북반구에 있는 우리의 계절은 가을이며 날은 추워졌고 해가 짧아졌습니다. 남반구는 반대로 날이 따뜻해지고 해가 길어졌겠죠. 계절의 변화는 태양의 길이는 곧 우리가 어디에 있는지에 따라 다르다는 것을 생각하게 해줍니다.
 
+좋은 소식은 천문학이 정확히 왜 그런지 알려줄 수 있다는 것입니다. 나쁜 소식은 그걸 설명하려면 아주 [복잡한](https://en.wikipedia.org/wiki/Position_of_the_Sun) 계산이 필요하다는 것입니다.
 
-The `si` key corresponds to an array of dictionaries with integer and floating-point values.
-Of the nested dictionary keys, `i` is the easiest to understand: incrementing from 0 to 15, they're the index of the image in the sequence.
-It'd be hard to guess `a` and `z` without any additional information, but they turn out to represent the altitude (`a`) and azimuth (`z`) of the sun in the corresponding pictures.
-
-
-### Calculating Solar Position
-
-
-At the time of writing, those of us in the northern hemisphere are settling into the season of autumn and its shorter, colder days, whereas those of us in the southern hemisphere are gearing up for hotter and longer days.
-The changing of the seasons reminds us that the duration of a solar day depends where you are on the planet and where the planet is in its orbit around the sun.
-
-
-The good news is that astronomers can tell you --- with perfect accuracy --- where the sun is in the sky for any location or time.
-The bad news is that the necessary calculations are [complicated](https://en.wikipedia.org/wiki/Position_of_the_Sun) to say the least.
-
-
-Honestly, we don't really understand it ourselves, and are pretty much just porting whatever code we manage to find online.
-After some trial and error, we were able to arrive at [something that seems to work](https://github.com/NSHipster/DynamicDesktop/blob/master/SolarPosition.playground) (PRs welcome!):
+솔직히 말하자면 우리는 우리 자신을 이해시킬 필요가 없습니다. 우리는 그저 인터넷에서 찾은 내용을 포팅하면 됩니다.
+몇번의 시도와 에러 끝에 저희는 [실제로 작동하는 코드](https://github.com/NSHipster/DynamicDesktop/blob/master/SolarPosition.playground)에 어느정도 도달한 것 같습니다. (PR은 환영입니다!)
 
 ```swift
 import Foundation
@@ -230,33 +211,26 @@ print("\(position.azimuth)° Az / \(position.elevation)° El")
 ```
 
 <samp>
-Solar Position on Oct 1, 2018 at 12:00
+2018년 10월 1일 12시의 태양 위치
 180.73470025840783° Az / 49.27482549913847° El
 </samp>
 
+2018년 10월 1일 정오에 Apple Park의 태양빛은 남쪽에서 오고 수평선과 머리 바로 위의 사이에서 비치고 있었습니다.
 
-At noon on October 1, 2018, the sun shines on Apple Park from the south, about halfway between the horizon and directly overhead.
-
-
-If track the position of the sun over an entire day, we get a sinusoidal shape reminiscent of the Apple Watch "Solar" face.
+하루 종일 태양의 위치를 추적한다면 우리는 Apple Watch의 "Solar" 페이스를 닮은 사인 그래프 모양을 얻게 될 것입니다.
 
 {% asset solar-position-watch-faces.jpg %}
 
+### XMP에 대한 이해 확장하기
 
-### Extending Our Understanding of XMP
+좋습니다. 천문학은 충분한 것 같습니다.
+이제 조금 지루한 내용으로 가보겠습니다. XML 메타데이터 표준입니다.
 
+`hasXMP` 메타데이터 키를 기억하시나요? _그겁니다._
 
-Alright, enough astronomy for the moment.
-Let's ground ourselves in something much more banal: _de facto_ XML metadata standards.
-
-
-Remember the `hasXMP` metadata key from before?
-Yeah, _that_.
-
-
-<abbr title="Extensible Metadata Platform">XMP</abbr>, or Extensible Metadata Platform, is a standard format for tagging files with metadata.
-What does XMP look like?
-Brace yourself:
+<abbr title="Extensible Metadata Platform">XMP</abbr> 또는 Extensible Metadata Platform은 메타데이터로 파일을 태깅하는 표준 형식입니다.
+XMP는 어떻게 생겼을까요?
+마음 단단히 먹으세요!
 
 ```swift
 let xmpData = CGImageMetadataCreateXMPData(metadata, nil)
@@ -277,21 +251,15 @@ print(xmp)
 </x:xmpmeta>
 ```
 
+_웩_
 
-_Yuck._
+우리는 `apple_desktop` 라는 이름이 우리가 만든 Dynamic Desktop 이미지에도 잘 작동하는지 확인할 필요가 있습니다.
 
+말하자면 이제 시작이라는거죠.
 
-But it's a good thing that we checked.
-We'll need to honor that `apple_desktop` namespace to make our own Dynamic Desktop images work correctly.
+## 자기만의 Dynamic Desktop 만들기
 
-
-Speaking of, let's get started on that.
-
-
-## Creating Our Own Dynamic Desktop
-
-
-Let's create a data model to represent a Dynamic Desktop:
+Dynamic Desktop을 표현하는 데이터 모델을 만들어보겠습니다.
 
 ```swift
 struct DynamicDesktop {
@@ -316,17 +284,14 @@ struct DynamicDesktop {
 }
 ```
 
+각 Dynamic Desktop은 정렬된 이미지 시퀀스로 이루어져 있습니다. 이 이미지는 `CGImage` 객체가 저장된 이미지 데이터와 이전에 다뤘던 메타데이터로 이루어져 있습니다.
+우리는 컴파일러가 자동으로 일을 마치게 하기 위해 `Metadata` 선언시에 `Codable` 을 사용합니다.
+Base64로 인코딩된 바이너리 프로퍼티 리스트를 생성할 때 이를 활용할 것입니다.
 
-Each Dynamic Desktop comprises an ordered sequence of images, each of which has image data, stored in a `CGImage` object, and metadata, as discussed before.
-We adopt `Codable` in the `Metadata` declaration in order for the compiler to automatically synthesize conformance.
-We'll take advantage of that when it comes time to generate the Base64-encoded binary property list.
+### 이미지 경로에 작성하기
 
-
-### Writing to an Image Destination
-
-
-First, create a `CGImageDestination` with a specified output URL.
-The file type is `heic` and the source count is equal to the number of images to be included.
+먼저 특정 URL로 `CGImageDestination` 를 생성합니다.
+파일 타입은 `heic` 이고 원본 숫자는 포함돼있던 것과 동일합니다.
 
 ```swift
 guard let imageDestination = CGImageDestinationCreateWithURL(
@@ -340,9 +305,8 @@ else {
 }
 ```
 
-
-Next, enumerate over each image in the dynamic desktop object.
-By using the `enumerated()` method, we also get the current `index` for each loop so that we can set the image metadata on the first image:
+다음으로 dynamic desktop 객체의 각 이미지를 순환합니다.
+`enumerated()` 메소드를 사용하면 우리는 반복문 속에서도 현재 `index` 를 알 수 있으니 첫 번째 이미지의 메타데이터 값을 설정해보겠습니다.
 
 ```swift
 for (index, image) in dynamicDesktop.images.enumerated() {
@@ -374,11 +338,10 @@ for (index, image) in dynamicDesktop.images.enumerated() {
 }
 ```
 
-Aside from the unrefined nature of Core Graphics APIs, the code is pretty straightforward.
-The only part that requires further explanation is the call to `CGImageMetadataTagCreate(_:_:_:_:_:)`.
+Core Graphics API의 정제되지 않은 특징 외에는 위의 코드는 꽤 쉽습니다.
+추가적인 설명이 필요한 부분은 `CGImageMetadataTagCreate(_:_:_:_:_:)` 를 호출하는 부분뿐입니다.
 
-
-Because of a mismatch between how image and container metadata are structured and how they're represented in code, we have to implement `Encodable` for `DynamicDesktop` ourselves:
+이미지와 메타데이터가 이루어진 방식과 코드에서 표현되는 방식의 괴리때문에 우리는 `DynamicDesktop` 을 위한 `Encodable` 을 직접 만들어야 했습니다.
 
 ```swift
 extension DynamicDesktop: Encodable {
@@ -398,7 +361,7 @@ extension DynamicDesktop: Encodable {
             keyedContainer.nestedContainer(keyedBy: NestedCodingKeys.self,
                                            forKey: .ap)
 
-        // FIXME: Not sure what `l` and `d` keys indicate
+        // 도와주세요: `l`과 `d`가 정확히 나타내는 값을 모르겠어요
         try nestedKeyedContainer.encode(0, forKey: .l)
         try nestedKeyedContainer.encode(self.images.count, forKey: .d)
 
@@ -411,8 +374,7 @@ extension DynamicDesktop: Encodable {
 }
 ```
 
-
-With that in place, we can implement the aforementioned `base64EncodedMetadata()` method like so:
+위의 Encodable이 완성되면 앞에서 언급했던 `base64EncodedMetadata()` 메소드를 다음과 같이 구현할 수 있을 것입니다.
 
 ```swift
 extension DynamicDesktop {
@@ -426,8 +388,7 @@ extension DynamicDesktop {
 }
 ```
 
-
-Once the for-in loop is exhausted, and all images and metadata are written, we call `CGImageDestinationFinalize(_:)` to finalize the image source and write the image to disk.
+for-in 반복문이 끝나서 모든 이미지와 메타데이터가 작성되고나면 이제 `CGImageDestinationFinalize(_:)` 를 호출해서 이미지를 마무리하고 디스크에 저장하면 됩니다.
 
 ```swift
 guard CGImageDestinationFinalize(imageDestination) else {
@@ -435,65 +396,48 @@ guard CGImageDestinationFinalize(imageDestination) else {
 }
 ```
 
-
-If everything worked as expected, you should now be the proud owner of a brand new Dynamic Desktop.
-Nice!
+모든 것이 예상했던 대로 작동한다면 이제 새로운 Dynamic Desktop의 주인이 된 것을 자랑스럽게 여기셔도 됩니다.
+끝내주네요!
 
 ---
 
+Mojave의 새로운 기능인 Dynamic Desktop을 사랑하며 윈도우 95에서 대유행을 했던 배경화면과 비슷한 것이 다시 나와서 정말 즐겁습니다.
 
-We love the Dynamic Desktop feature in Mojave, and are excited to see the same proliferation of them that we saw when wallpapers hit the mainstream with Windows 95.
+여러분도 그렇게 생각하신다면 다음과 같은 아이디어를 시도해보세요.
 
+### 사진에서 자동으로 Dynamic Desktop 생성하기
 
-If you're so inclined, here are a few ideas for where to go from here:
+천체의 움직임처럼 엄청난 것이 시간과 장소라는 두 가지 입력의 방정식으로 축소될 수 있다는 것은 정말 충격적입니다.
 
+이전의 예시처럼 이 정보는 하드 코딩돼있었지만 이미지에서 정보를 추출하는 것은 자동으로 할 수 있었습니다.
 
-### Automatically Generating a Dynamic Desktop from Photos
+기본적으로 대부분의 핸드폰의 카메라는 사진을 찍을때마다 [Exif 메타데이터](https://en.wikipedia.org/wiki/Exif) 값도 같이 저장합니다.
+이 메타데이터는 사진이 찍힌 시간과 기기의 위치 정보(GPS)를 포함할 수 있습니다.
 
+이미지 메타데이터에서 시간과 위치 정보를 직접 읽으면 우리는 자동으로 태양의 위치를 계산할 수 있으며 사진 시리즈를 통해서 Dynamic Desktop를 만드는 과정을 간편하게 만들 수 있을 것입니다.
 
-It's mind-blowing to think that something as transcendent as the movement of celestial bodies can be reduced to a system of equations with two inputs: time and place.
+### iPhone의 타임 랩스 이용하기
 
-In the example before, this information is hard-coded, but you could ostensibly extract that information from images automatically.
+iPhone XS를 좋은 곳에 사용하고 싶으신가요?
+(더 정확히 말하자면, "오래된 iPhone을 팔기 전에 생산적인 활동에 사용해보고 싶으신가요?")
 
+창문에 아이폰을 놓고, 충전기에 끼운 다음, 카메라를 타임 랩스 모드로 설정한 후에, "녹화" 버튼을 누르세요.
+결과로 나온 비디오에서 키 프레임을 추출해내면 여러분만의 맞춤 제작 Dynamic Desktop을 만들 수 있을 것입니다.
 
-By default, the camera on most phones captures [Exif metadata](https://en.wikipedia.org/wiki/Exif) each time a photo is snapped.
-This metadata can include the time which the photo was taken and the GPS coordinates of the device at the time.
+[Skyflow](https://itunes.apple.com/us/app/skyflow-time-lapse-shooting/id937208291?mt=8)나 비슷한 앱을 사용하면 더 쉽게 지정된 간격으로 사진을 찍을 수 있습니다.
 
+### GIS 데이터로 풍경 생성하기
 
-By reading time and location information directly from image metadata, you can automatically determine solar position and simplify the process of generating a Dynamic Desktop from a series of photos.
+아이폰과 하루라도 떨어져 있을 수 없거나 (슬프네요) 기억할만한 녹화거리가 없다면 (이것도 슬프네요), 현실을 창조해내면 됩니다. (가장 슬픈 얘기네요)
 
+[Terragen](https://planetside.co.uk)같은 앱을 사용하면 현실같은 3D 풍경 사진을 만들 수 있습니다. 게다가 땅과 태양, 하늘까지 다 조정할 수 있습니다.
 
-### Shooting a Time Lapse on Your iPhone
+미국의 Geological Survey의 [National Map 웹사이트](https://viewer.nationalmap.gov/basic/)에서 다운로드 받아서 3D 렌더링 프로젝트의 템플릿에 사용하면 일이 더 쉬워질 것입니다.
 
+### 이미 만들어진 Dynamic Desktop 다운로드받기
 
-Want to put your new iPhone XS to good use?
-(Or more accurately, "Want to use your old iPhone for something productive while you procrastinate selling it?")
+해야 할 일이 많고 이쁜 사진을 만드는 데에 쓸 시간이 없다면 항상 방법은 있습니다. 바로 다른 누군가에게 돈을 주고 사는 것이죠.
 
+저희는 개인적으로 [24 Hour Wallpaper](https://www.jetsoncreative.com/24hourwallpaper/)의 팬입니다.
 
-Mount your phone against a window, plug it into a charger, set the Camera to Timelapse mode, and hit the "Record" button.
-By extracting key frames from the resulting video, you can make your very own _bespoke_ Dynamic Desktop.
-
-
-You might also want to check out [Skyflow](https://itunes.apple.com/us/app/skyflow-time-lapse-shooting/id937208291?mt=8) or similar apps that more easily allow you to take still photos at predefined intervals.
-
-
-### Generating Landscapes from GIS Data
-
-
-If you can't stand to be away from your phone for an entire day (sad) or don't have anything remarkable to look (also sad), you could always create your own reality (sounds sadder than it is).
-
-
-Using an app like [Terragen](https://planetside.co.uk), you can render photo-realistic 3D landscapes, with fine-tuned control over the earth, sun, and sky.
-
-
-You can make it even easier for yourself by downloading an elevation map from the U.S. Geological Survey's [National Map website](https://viewer.nationalmap.gov/basic/) and using that as a template for your 3D rendering project.
-
-
-### Downloading Pre-Made Dynamic Desktops
-
-
-Or if you have actual work to do and can't be bothered to spend your time making pretty pictures, you can always just pay someone else to do it for you.
-
-
-We're personally fans of the the [24 Hour Wallpaper](https://www.jetsoncreative.com/24hourwallpaper/) app.
-If you have any other recommendations, [@ us on Twitter!](https://twitter.com/NSHipster/).
+또 다른 추천할 것이 있다면 [트위터에서 태그해주세요](https://twitter.com/NSHipster/)!
