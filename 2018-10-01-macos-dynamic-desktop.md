@@ -119,7 +119,7 @@ kAGSAZsBpAGtAa8BuAHBAcMBzAHOAdcB4AHpAesB9AAAAAAAAAIBAAAAAAAAAEkA
 AAAAAAAAAAAAAAAAAAH9
 ```
 
-### 태양계의 빛나는 태양
+### Shining Light on Solar
 
 대부분의 우리는 이 알 수 없는 글자의 벽을 보고선 조용히 맥북을 닫았을 것입니다. 하지만 몇 분은 아셨을 사실인데 이 텍스트는 [Base64-encoded](https://en.wikipedia.org/wiki/Base64)로 암호화된 것과 아주 비슷하게 생겼습니다.
 
@@ -183,7 +183,7 @@ _이제야 말이 통하네요!_
 
 `si` 키는 정수와 실수 값을 가지는 딕셔너리의 배열을 값으로 가집니다.
 중첩된 딕셔너리들의 키를 살펴보겠습니다. `i` 는 딱 보면 알 수 있듯이 0에서 15로 증가하는 인덱스 값입니다.
-`a` 와 `z` 는 다른 정보 없이는 추측하기가 어렵습니다. 하지만 고도(altitude)와 방위각(azimuth)를 생각하시면 쉽습니다.
+`a` 와 `z` 는 고도(altitude)와 방위각(azimuth)를 생각하시면 쉽습니다.
 
 ### 태양의 위치 계산하기
 
