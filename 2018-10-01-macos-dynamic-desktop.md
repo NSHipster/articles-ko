@@ -14,7 +14,6 @@ status:
 
 몇 년 전엔 어떤 팬이 Night Shift와 비슷하고 늦은 밤에 (또는 이른 아침) 개발하는 사람들의 눈의 피로를 줄여주는 기능을 만들기도 했습니다.
 
-두 macOS 기능을 삼각 측량해보면 이번 Mojave에서 새로 나온 Dynamic Desktops로 귀결될 것입니다.
 "시스템 환경설정 > 데스크탑 및 화면 보호기"에 가면 새로운 선택지인 "다이내믹"을 볼 수 있을 것입니다. 이 기능은 여러분의 위치와 시간에 따라 배경화면이 변하는 기능입니다.
 
 {% asset desktop-and-screen-saver-preference-pane.png %}
