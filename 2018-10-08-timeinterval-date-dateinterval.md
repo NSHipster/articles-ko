@@ -13,43 +13,35 @@ status:
   swift: 4.2
 ---
 
+마드리드의 Centro 지구와 Salamanca 지구의 사이에, Buen Retiro Park에서 걸어갈 수 있는 거리에 위치한 프라도 박물관은 유럽에서 가장 유명한 화가들의 작품을 다양하게 보유하고 있습니다.
+만약 여러분이 17세기 스페인 군주들의 초상화에 싫증이 났을 경우엔 1층 가장 북쪽에 있는 _Sala 002_ 방을 방문하는 것을 추천드립니다.
+그곳엔 [프랑스 화가인 Simon Vouet이 바로크 시대동안 그렸던 그림들을 보실 수 있습니다](https://www.museodelprado.es/en/the-collection/art-work/time-defeated-by-hope-and-beauty/ebaeb191-f3ff-43b1-9207-fb36a3e5ad5a).
 
-Nestled between Madrid's Centro and Salamanca districts, just a short walk from the sprawling Buen Retiro Park, The Prado Museum boasts an extensive collection of works from Europe's most celebrated painters.
-But if, during your visit, you begin to tire of portraiture commissioned by 17th-century Spanish monarchs, consider visiting the northernmost room of the 1st floor --- _Sala 002_.
-There you'll find [this Baroque era painting by the French artist Simon Vouet](https://www.museodelprado.es/en/the-collection/art-work/time-defeated-by-hope-and-beauty/ebaeb191-f3ff-43b1-9207-fb36a3e5ad5a).
+이 그림을 보면 두 젊은 여성들이 갈고리와 창을 들고 늙은 남자를 위협하는 이유와 천사들이 뒤에서 웃으며 구경하고 있는 이유에 대해 궁금하실 것입니다.
+그것은 당연히 우화적인 이유입니다. 근처에 있는 설명글을 읽고나면 여러분은 이 작품이 _시간이 희망과 아름다움에 패배한다_ 는 것을 느끼셨을 것입니다.
+늙은 남자는 왜 시간을 의미할까요?
+손에 있는 모래시계와 발쪽에 있는 낫을 보면 이해하실 것입니다.
 
+잠시동안 작품앞에 서서 시간의 수수께끼같은 속성에 대해 생각해보세요.
 
-You'd be forgiven for wondering why this pair of young women, brandishing a hook and spear, stand menacingly over a cowering old man while a mob of cherubim tears at his back.
-It is, of course, allegorical: reading the adjacent placard, you'll learn that this piece is entitled _Time defeated by Hope and Beauty_.
-The old man? That's Time.
-See the hourglass in his hand and scythe at his feet?
+우리가 시간을 얼마나 제한적이게 생각하고 있는지는 Foundation의 날짜와 시간 API의 이름에서 드러납니다. (혹은 더 악화됐을수도 있겠습니다)
 
-
-Take a moment, standing in front of this painting, to reflect on the enigmatic nature of time.
-
-
-Think now about how our limited understanding of time is reflected in --- or perhaps exacerbated by --- the naming of the Foundation date and time APIs.
-
-
-It's about time we got them straight.
+이제 이를 바로잡을 시간입니다.
 
 ---
 
+초(Seconds)는 시간의 근본적인 단위입니다.
+그리고 그들은 고정된 기간의 단위를 표현합니다.
 
-Seconds are the fundamental unit of time.
-They're also the only unit that has a fixed duration.
+달(Months)은 다양한 기간을 가지고 있으며(_9월은 30일이 있죠_), 년(Years)도 그렇습니다(_400년마다 71개의 년이 53주를 가집니다_). 특정 년에는 추가적인 날이 존재하고 여름에는 시간 절약을 위해 1시간을 더 얻거나 덜 얻습니다. (_고마워요 벤자민 프랭클린_)
+그리고 어떤 기이한 날에는 1분에 61초, 1시간에 3601초, 하루에 1209601초가 들기도 합니다.
 
+`TimeInterval` (옛날 이름은 `NSTimeInterval`) 은 기간을 초로 나타낸 값을 `Double` 타입으로 가지고 있는 typealias입니다.
+시간의 기간을 다루는 API의 반환 타입이나 파라미터인 TimeInterval을 본 적 있을 것입니다.
+두배로 정밀한 부동 소수점 수인 `TimeInterval` 은 분수로도 나타낼 수 있습니다.
+(밀리세컨드를 넘어선 정밀도를 필요로 한다면요)
 
-Months vary in length (_30 days hath September..._), as do years (_53 weeks hath 71 years every cycle of 400..._) certain years pick up an extra day (_leap years are misnamed if you think about it_), and days gain and lose an hour from daylight saving time (_thanks, Benjamin Franklin_).
-And that's to say nothing of leap seconds, which are responsible for such oddities as the 61 second minute, the 3601 second hour, and, of course, the 1209601 second fortnight.
-
-
-`TimeInterval` (née `NSTimeInterval`) is a typealias for `Double` that represents duration as a number of seconds.
-You'll see it as a parameter or return type for APIs that deal with a duration of time.
-Being a double-precision floating-point number, `TimeInterval` can represent submultiples in its fraction, (though for anything beyond millisecond precision, you'll want to use something else).
-
-
-## Date and Time
+## 날짜와 시간 (Date and Time)
 
 
 It's unfortunate that the Foundation type representing time is named `Date`.
