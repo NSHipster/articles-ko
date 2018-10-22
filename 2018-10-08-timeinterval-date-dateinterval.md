@@ -10,8 +10,6 @@ status:
   swift: 4.2
 ---
 
-시간에 대한 우리의 제한적인 이해는 Foundation의
-
 마드리드의 Centro 지구와 Salamanca 지구의 사이에 있고 Buen Retiro Park에서 걸어갈 수 있는 거리에 위치한 Prado 미술관은 유럽에서 가장 유명한 화가들의 작품을 다양하게 보유하고 있습니다.
 만약 여러분이 17세기 스페인 군주들의 초상화에 싫증이 났을 경우엔 1층 가장 북쪽에 있는 _Sala 002_ 방을 방문하는 것을 추천드립니다.
 그곳엔 [프랑스 화가인 Simon Vouet이 바로크 시대동안 그렸던 그림들을 보실 수 있습니다](https://www.museodelprado.es/en/the-collection/art-work/time-defeated-by-hope-and-beauty/ebaeb191-f3ff-43b1-9207-fb36a3e5ad5a).
