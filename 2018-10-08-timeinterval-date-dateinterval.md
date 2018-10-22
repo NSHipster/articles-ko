@@ -13,7 +13,7 @@ status:
   swift: 4.2
 ---
 
-마드리드의 Centro 지구와 Salamanca 지구의 사이에, Buen Retiro Park에서 걸어갈 수 있는 거리에 위치한 프라도 박물관은 유럽에서 가장 유명한 화가들의 작품을 다양하게 보유하고 있습니다.
+마드리드의 Centro 지구와 Salamanca 지구의 사이에 있고 Buen Retiro Park에서 걸어갈 수 있는 거리에 위치한 Prado 미술관은 유럽에서 가장 유명한 화가들의 작품을 다양하게 보유하고 있습니다.
 만약 여러분이 17세기 스페인 군주들의 초상화에 싫증이 났을 경우엔 1층 가장 북쪽에 있는 _Sala 002_ 방을 방문하는 것을 추천드립니다.
 그곳엔 [프랑스 화가인 Simon Vouet이 바로크 시대동안 그렸던 그림들을 보실 수 있습니다](https://www.museodelprado.es/en/the-collection/art-work/time-defeated-by-hope-and-beauty/ebaeb191-f3ff-43b1-9207-fb36a3e5ad5a).
 
@@ -43,21 +43,18 @@ status:
 
 ## 날짜와 시간 (Date and Time)
 
-
-It's unfortunate that the Foundation type representing time is named `Date`.
-Colloquially, one typically distinguishes "dates" from "times" by saying that the former has to do with calendar days and the latter has more to do with the time of day.
-But `Date` is entirely orthogonal from calendars, and contrary to its name represents an absolute point in time.
+시간을 표현하는 Foundation 타입의 이름이 `Date` 라는 것은 불행한 일입니다.
+구어체로 말할 때를 생각해보면 "날짜"는 "시간"과 구별해서 말하는 편이며 전자는 달력의 어떤 날을 의미하고 후자는 하루의 어떤 시간을 의미합니다.
+하지만 `Date` 는 완전히 달력과는 다르며 그 이름과는 반대로 시간의 절대적인 지점을 표현합니다.
 
 {% info %}
 
-
-Why `NSDate` and not `NSTime`?
-Our guess is that the originators of this API wanted to match its [counterpart in `java.util.date`](https://docs.oracle.com/javase/7/docs/api/java/util/Date.html) when <abbr title="Enterprise Objects Framework">EOF</abbr> targeted both Java and Objective-C.
+왜 `NSTime` 이 아니라 `NSDate` 일까요?
+저희의 추측은 EOF(Enterprise Objects Framework)가 Java와 Objective-C 모두를 목표로 삼았을 때 이 API를 설계한 사람이 [`java.util.date`의 대항마](https://docs.oracle.com/javase/7/docs/api/java/util/Date.html)로 만들려고 했다는 것입니다.
 
 {% endinfo %}
 
-
-Another source of confusion for `Date` is that, despite representing an absolute point in time, it's [defined by a time interval since a reference date](https://github.com/apple/swift-corelibs-foundation/blob/master/Foundation/Date.swift#L17-L20):
+`Date` 에 대한 혼란의 또 다른 이유는 시간의 절대적인 지점을 나타내는 것에도 불구하고 [참조 날짜 이후의 시간 간격으로 정의된다는 것](https://github.com/apple/swift-corelibs-foundation/blob/master/Foundation/Date.swift#L17-L20)입니다.
 
 ```swift
 public struct Date : ReferenceConvertible, Comparable, Equatable {
@@ -69,35 +66,30 @@ public struct Date : ReferenceConvertible, Comparable, Equatable {
 }
 ```
 
-
-The reference date, in this case, is the first instant of January 1, 2001, Greenwich Mean Time (GMT).
+이 경우에는 참조 날짜는 2001년 1월 1일 GMT(Greenwich Mean Time)의 첫번째 인스턴트입니다.
 
 {% info %}
 
-
-While we're on the subject of conjectural sidebars, does anyone know why Apple created a new standard instead of using, say, the Unix Epoch (January 1, 1970)? 2001 was the year that Mac OS X was first released, but `NSDate` pre-NSDates that from its NeXT days.
-Was it perhaps a hedge against [Y2K](https://en.wikipedia.org/wiki/Year_2000_problem)?
+아직도 이유를 모르겠는 사실이 있습니다.
+Apple은 왜 Unix Epoch(1970년 1월 1일)를 사용하지 않았을까요?
+2001년은 Mac OS X의 첫 번째 릴리즈가 있었던 해였지만 `NSDate` 는 NeXT에도 존재했었습니다.
+[Y2K](https://en.wikipedia.org/wiki/Year_2000_problem) 때문이었을까요?
 
 {% endinfo %}
 
+## Date Intervals와 Time Intervals
 
-## Date Intervals and Time Intervals
+`DateInterval` 은 비교적 최근 추가된 내용입니다.
+iOS 10과 macOS Sierra에 소개됐으며 이 타입은 두 시간의 절대적인 지점의 닫힌 간격을 나타냅니다. (기간을 초로 나타내는 `TimeInterval` 과는 대조적입니다.)
 
+그래서 이건 어디에 쓰일까요?
+다음과 같이 사용할 수 있을 것입니다.
 
-`DateInterval` is a recent addition to Foundation.
-Introduced in iOS 10 and macOS Sierra, this type represents a closed interval between two absolute points in time (again, in contrast to `TimeInterval`, which represents a duration in seconds).
+### Calendar Unit의 Date Interval 구하기
 
-
-So what is this good for?
-Consider the following use cases:
-
-
-### Getting the Date Interval of a Calendar Unit
-
-
-In order to know the time of day for a point in time --- or what day it is in the first place --- you need to consult a calendar.
-From there, you can determine the range of a particular calendar unit, like a day, month, or year.
-The `Calendar` method `dateInterval(of:for:)` makes this really easy to do:
+시간의 특정 지점을 어떤 날의 시간으로 표현하기 위해선 calendar를 참고해야 합니다.
+여기서 여러분은 특정 calendar unit의 범위를 일(day), 월(month) 또는 년(year)으로 구별할 수 있습니다.
+`Calendar` 의 메소드인 `dateInterval(of:for:)` 는 이를 정말 쉽게 만들어줍니다.
 
 ```swift
 let calendar = Calendar.current
@@ -105,9 +97,8 @@ let date = Date()
 let dateInterval = calendar.dateInterval(of: .month, for: date)
 ```
 
-
-Because we're invoking `Calendar`, we can be confident in the result that we get back.
-Look how it handles daylight saving transition without breaking a sweat:
+우리의 `Calendar` 는 우리를 배신하는 경우가 없으니 걱정마십시오.
+다음은 분위기를 깨지 않고 해가 떠있는 시간을 계산하는 예제입니다.
 
 ```swift
 let dstComponents = DateComponents(year: 2018,
@@ -115,22 +106,18 @@ let dstComponents = DateComponents(year: 2018,
                                    day: 4)
 calendar.dateInterval(of: .day,
                       for: calendar.date(from: dstComponents)!)?.duration
-// 90000 seconds
+// 90000 초
 ```
 
+_지금은 {{ site.time | date: '%Y' }}년 입니다.
+`secondsInDay = 86400`와 같이 하드코딩할 시기는 지났다고 생각합니다!_
 
-_It's {{ site.time | date: '%Y' }}.
-Don't you think that it's time you stopped hard-coding `secondsInDay = 86400`?_
+## Date Intervals의 교차 지점 계산하기
 
+이 예제에선 다시 Prado 미술관으로 돌아가서 그들의 광대한 Rubens의 그림 컬렉션을 존경해봅시다. 특히 여기 [Swift 프로그래밍의 신을 명백하게 묘사한 그림](https://www.museodelprado.es/coleccion/obra-de-arte/eolo/e447dadb-b93f-4ce5-84e9-e6ae1d95c6cd)은 꼭 보세요.
 
-## Calculating Intersections of Date Intervals
-
-
-For this example, let's return to The Prado Museum and admire its extensive collection of paintings by Rubens --- particularly [this apparent depiction of the god of Swift programming](https://www.museodelprado.es/coleccion/obra-de-arte/eolo/e447dadb-b93f-4ce5-84e9-e6ae1d95c6cd).
-
-
-Rubens, like Vouet, painted in the Baroque tradition.
-The two were contemporaries, and we can determine the full extent of how they overlap in the history of art with the help of `DateInterval`:
+Vouet처럼 Rubens도 Baroque 전통의 그림을 그렸습니다.
+이 둘은 동시대의 인물들이었고 우리는 `DateInterval` 의 도움을 받아서 그 둘이 역사에서 얼마나 겹치는지 알아보도록 하겠습니다.
 
 ```swift
 import Foundation
@@ -160,11 +147,9 @@ calendar.dateComponents([.year],
                         to: overlap.end) // 50 years
 ```
 
+우리의 계산에 의하면 이 둘은 50년동안 같은 시대를 공유했습니다.
 
-According to our calculations, there was a period of 50 years where both painters were living.
-
-
-We can even take things a step further and use `DateIntervalFormatter` to provide a nice representation of that time period:
+심지어 `DateIntervalFormatter` 를 사용하면 그 시간대를 더 이쁘게 표현할 수도 있습니다.
 
 ```swift
 let formatter = DateIntervalFormatter()
@@ -174,16 +159,13 @@ formatter.string(from: overlap)
 // "1590 – 1640"
 ```
 
-
-_Beautiful._
-You might as well print this code out, frame it, and hang it next to [_The Judgement of Paris_](https://www.museodelprado.es/en/the-collection/art-work/the-judgement-of-paris/f8b061e1-8248-42ae-81f8-6acb5b1d5a0a).
+_아름답네요._
+이 코드는 출력해서 액자에 담아서 [_The Judgement of Paris_](https://www.museodelprado.es/en/the-collection/art-work/the-judgement-of-paris/f8b061e1-8248-42ae-81f8-6acb5b1d5a0a) 작품 옆에 걸어놔도 될 정도로 아름답습니다.
 
 ---
 
+사실 우리는 아직 시간이 _무엇인지_ (또는 그것이 실제로 존재하는지조차) 알지 못합니다.
+하지만 저는 우리 개발자들이 Foundation의 `Date` API에서 아름다움을 발견하고 언젠가는 이해가 부족한 부분들을 배워서 극복하는 것을 희망합니다.
 
-The fact is, we still don't really know _what_ time is (or if it even actually exists).
-But I'm hopeful that we, as developers, will find the beauty in Foundation's `Date` APIs, and in time, learn how to overcome our lack of understanding.
-
-
-That does it for this week's article.
-See you all next time.
+여기까지 이 주의 글이었습니다.
+다음 시간에 뵙겠습니다.
