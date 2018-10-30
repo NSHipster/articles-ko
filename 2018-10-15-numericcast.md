@@ -10,35 +10,28 @@ status:
   swift: 4.2
 ---
 
+누구나 프로그래밍을 설명할 때 주로 사용하는 비유가 있을 것입니다.
 
-Everyone has their favorite analogy to describe programming.
+목공부터 뜨개질, 정원 가꾸기까지 다양하게 비유할 것입니다.
+게다가 프로그래밍은 문제 해결, 스토리텔링, 예술 작품으로도 비유할 수 있을 것입니다.
+작문에 비유한다면 그 프로그램이 시인지 산문인지 문제는 의심의 여지도 없습니다.
+또는 프로그래밍이 음악이라면 분명히 재즈일 것입니다.
 
+지금 우리가 하고 있는 얘기는 중동지역의 이야기인 _천일야화_(The Thousand and One Nights)와 가장 비슷하다고 생각합니다. 천일야화의 아무 이야기 하나를 읽어보면 초자연적인 존재인 지니(<dfn>jinn</dfn>, <dfn>djinn</dfn>, <dfn>genies</dfn> 또는 🧞‍)를 볼 수 있을 것입니다.
+이 존재를 뭐라고 부르든 우리는 이 존재가 소원을 이뤄주고 그에 필연적으로 따라오는 불행을 알고 있습니다.
 
-It's woodworking or it's knitting or it's gardening.
-Or maybe it's problem solving and storytelling and making art.
-That programming is like writing there is no doubt; the question is whether it's poetry or prose.
-And if programming is like music, it's always jazz for whatever reason.
+많은 방면에서 컴퓨터는 형이상학적 소원을 물리적으로 구체화해서 성취해줍니다.
+지니처럼 컴퓨터는 우리의 의도가 무엇인지에 상관없이 기쁘게 받아들이고 무엇이든 할 것입니다.
+그리고 에러가 발생하기 전까지 우리는 그것에 대해 아무것도 할 수 없을 수도 있습니다.
 
+Swift 개발자라면 정수형 변환 에러를 본 적이 있을 것입니다. 저는 이 에러를 볼 때 마다 "이 경고들 좀 사라지고 내 코드도 컴파일되면 좋겠네"라고 생각합니다.
 
-But perhaps the closest point of comparison for what we do all day comes from Middle Eastern folk tales: Open any edition of _The Thousand and One Nights_ (أَلْف لَيْلَة وَلَيْلَة‎) and you'll find descriptions of supernatural beings known as <dfn>jinn</dfn>, <dfn>djinn</dfn>, <dfn>genies</dfn>, or 🧞‍.
-No matter what you call them, you're certainly familiar with their habit of granting wishes, and the misfortune that inevitably causes.
-
-
-In many ways, computers are the physical embodiment of metaphysical wish fulfillment.
-Like a genie, a computer will happily go along with whatever you tell it to do, with no regard for what your actual intent may have been.
-And by the time you've realized your error, it may be too late to do anything about it.
-
-
-As a Swift developer, there's a good chance that you've been hit by integer type conversion errors and thought "I wish these warnings would go away and my code would finally compile."
-
-
-If that sounds familiar, you'll happy to learn about `numericCast(_:)`, a small utility function in the Swift Standard Library that may be exactly what you were hoping for.
-But be careful what you wish for, it might just come true.
+여러분도 그런 적이 있으시다면 `numericCast(_:)` 을 알기 딱 좋은 타이밍이십니다. `numericCast(_:)` 는 Swift 표준 라이브러리의 작은 유틸리티 기능이지만 우리가 원하는 딱 그 기능입니다.
+하지만 조심하세요 이건 그저 실현되는 것 뿐이니까요.
 
 ---
 
-
-Let's start by dispelling any magical thinking about what `numericCast(_:)` does by [looking at its implementation](https://github.com/apple/swift/blob/7f7b4f12d3138c5c259547c49c3b41415cd4206e/stdlib/public/core/Integers.swift#L3508-L3510):
+`numericCast(_:)` 가 [어떻게 생겼는지 알아보고](https://github.com/apple/swift/blob/7f7b4f12d3138c5c259547c49c3b41415cd4206e/stdlib/public/core/Integers.swift#L3508-L3510) 이에 걸려있는 마법적인 상상을 풀어보겠습니다.
 
 ```swift
 public func numericCast<T : BinaryInteger, U : BinaryInteger>(_ x: T) -> U {
@@ -46,38 +39,28 @@ public func numericCast<T : BinaryInteger, U : BinaryInteger>(_ x: T) -> U {
 }
 ```
 
+([`Never`](/never)에서도 배웠듯이 코드가 많다고 많은 충격을 주는 것이 아니고 코드가 적다고 주는 충격이 작은게 아닙니다)
 
-(As we learned in [our article about `Never`](/never), even the smallest amount of Swift code can have a big impact.)
+[`BinaryInteger`](https://developer.apple.com/documentation/swift/binaryinteger) 프로토콜은 숫자들이 언어안에서 어떻게 작동되고 있는지 검사하기 위해 Swift 4에서 추가되었습니다.
+`BinaryInteger` 는 signed, unsigned에 상관없이 모든 모양과 모든 사이즈의 정수를 다루는 하나의 통합된 인터페이스를 제공합니다.
 
+정수형을 다른 타입으로 변형할 때는 그 타입으로 표현이 안되는 값이라도 변형은 가능합니다.
+문제는 signed 정수를 unsigned 정수로 변형하려고 할 경우 (예를 들어 `-42` 를 `UInt` 로 변형하려고 할 때) 또는 바꾸고자하는 타입의 한계를 넘어가는 경우(예를 들어 `UInt8` 은 `0` 부터 `255` 까지밖에 표현하지 못합니다)에 발생합니다.
 
-The [`BinaryInteger`](https://developer.apple.com/documentation/swift/binaryinteger) protocol was introduced in Swift 4 as part of an overhaul to how numbers work in the language.
-It provides a unified interface for working with integers, both signed and unsigned, and of all shapes and sizes.
+`BinaryInteger` 는 변형에 대한 네 가지 전략을 세웠습니다.
 
+- **Range-Checked Conversion** ([`init(_:)`](https://developer.apple.com/documentation/swift/binaryinteger/2885704-init)): 한계를 넘어가는 런타임 에러를 일으킵니다
 
-When you convert an integer value to another type, it's possible that the value can't be represented by that type.
-This happens when you try to convert a signed integer to an unsigned integer (for example, `-42` as a `UInt`), or when a value exceeds the representable range of the destination type (for example, `UInt8` can only represent numbers between `0` and `255`).
+- **Exact Conversion** ([`init?(exactly:)`](https://developer.apple.com/documentation/swift/binaryinteger/2925955-init)): 한계를 넘어가는 값의 경우 `nil`을 반환합니다
 
+- **Clamping Conversion** ([`init(clamping:)`](https://developer.apple.com/documentation/swift/binaryinteger/2886143-init)): 한계를 넘어가는 값의 경우 가장 가까운 표현가능한 타입을 사용합니다
 
-`BinaryInteger` defines four strategies of conversion between integer types, each with different behaviors for handling out-of-range values:
+- **Bit Pattern Conversion** ([`init(truncatingIfNeeded:)`](https://developer.apple.com/documentation/swift/binaryinteger/2925529-init)): 대상으로 하는 정수형의 너비로 잘라냅니다
 
-
-- **Range-Checked Conversion**
-  ([`init(_:)`](https://developer.apple.com/documentation/swift/binaryinteger/2885704-init)): Trigger a runtime error for out-of-range values
-
-- **Exact Conversion**
-  ([`init?(exactly:)`](https://developer.apple.com/documentation/swift/binaryinteger/2925955-init)): Return `nil` for out-of-range values
-
-- **Clamping Conversion**
-  ([`init(clamping:)`](https://developer.apple.com/documentation/swift/binaryinteger/2886143-init)): Use the closest representable value for out-of-range values
-
-- **Bit Pattern Conversion**
-  ([`init(truncatingIfNeeded:)`](https://developer.apple.com/documentation/swift/binaryinteger/2925529-init)): Truncate to the width of the target integer type
-
-
-The correct conversion strategy depends on the situation in which it's being used.
-Sometimes it's desireable to clamp values to a representable range; other times, it's better to get no value at all.
-In the case of `numericCast(_:)`, range-checked conversion is used for convenience.
-The downside is that calling this function with out-of-range values causes a runtime error (specifically, it traps on overflow in `-O` and `-Onone`).
+올바른 변형 전략은 그것이 사용되는 상황에 의존합니다.
+때로는 표현가능한 범위로 조정하는 것이 옳을 때도 있고 때로는 아무 값을 주지 않는 것이 옳을 때도 있습니다.
+`numericCast(_:)` 의 경우엔 편의를 위해 range-checked conversion이 사용됩니다.
+한계를 넘는 값을 이 함수를 호출하는데에 사용한다면 런타임 에러가 날 수 있다는 것이 단점입니다. (구체적으로는 `-0` 과 `-0none` 의 경우에 오버플로우에 걸립니다)
 
 {% info %}
 
