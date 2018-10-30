@@ -64,77 +64,64 @@ public func numericCast<T : BinaryInteger, U : BinaryInteger>(_ x: T) -> U {
 
 {% info %}
 
+숫자들이 Swift 4에서 바뀌면서 어떻게 작동하게 되었는지에 대한 더 자세한 정보는 [SE-0104: "Protocol-oriented integers"](https://github.com/apple/swift-evolution/blob/master/proposals/0104-improved-integers.md)를 확인해주세요.
 
-For more information about the changes to how numbers work in Swift 4, see [SE-0104: "Protocol-oriented integers"](https://github.com/apple/swift-evolution/blob/master/proposals/0104-improved-integers.md).
-
-
-This subject is also discussed at length in the [Flight School Guide to Numbers](https://gumroad.com/l/swift-numbers).
+이 주제는 또한 [Flight School Guide to Numbers](https://gumroad.com/l/swift-numbers)에서도 길게 다뤄집니다.
 
 {% endinfo %}
 
 
-## Thinking Literally, Thinking Critically
+## 문자 그대로 생각하기, 비판적으로 생각하기
 
+더 알아보기 전에 정수 리터럴에 대해 얘기하는 시간을 가져보겠습니다.
 
-Before we go any further, let's take a moment to talk about integer literals.
+[이전 글에서도 얘기 나눴듯이](https://nshipster.com/swift-literals/) Swift는 값을 표현하는 편리하고 확장성있는 방법을 제공합니다.
+Swift의 타입 추론을 사용하면 때로는 "그냥 되는" 경우가 있는데 이런 경우엔 정말 좋습니다. 하지만 "그냥 안되는" 경우라면 우리를 매우 혼란스럽게 할 것입니다.
 
-
-[As we've discussed in previous articles](https://nshipster.com/swift-literals/), Swift provides a convenient and extensible way to represent values in source code.
-When used in combination with the language's use of type inference, things often "just work" ...which is nice and all, but can be confusing when things "just don't".
-
-
-Consider the following example in which arrays of signed and unsigned integers are initialized from identical literal values:
+다음과 같이 signed 정수의 배열과 unsigned 정수의 배열이 있고 같은 값으로 초기화됐다고 해봅시다.
 
 ```swift
 let arrayOfInt: [Int] = [1, 2, 3]
 let arrayOfUInt: [UInt] = [1, 2, 3]
 ```
 
-
-Despite their seeming equivalence, we can't, for example, do this:
+그들이 보기에는 같아보임에도 불구하고 우리는 다음과 같은 상황을 마주하게 될 것입니다.
 
 ```swift
-arrayOfInt as [UInt] // Error: Cannot convert value of type '[Int]' to type '[UInt]' in coercion
+arrayOfInt as [UInt] // 에러: `[Int]` 타입을 `[UInt]` 타입으로 강제로 바꿀 수 없습니다
 ```
 
-
-One way to reconcile this issue would be to pass the `numericCast` function as an argument to `map(_:)`:
+이 이슈를 해결하는 한 가지 방법은 `map(_:)` 메소드에 `numericCast` 함수를 인자로 넘기는 것입니다.
 
 ```swift
 arrayOfInt.map(numericCast) as [UInt]
 ```
 
-
-This is equivalent to passing the `UInt` range-checked initializer directly:
+다음은 `UInt` range-checked initializer를 직접 보내는 방법입니다.
 
 ```swift
 arrayOfInt.map(UInt.init)
 ```
 
-
-But let's take another look at that example, this time using slightly different values:
+이번엔 조금 다른 값으로 같은 예제를 살펴보겠습니다.
 
 ```swift
 let arrayOfNegativeInt: [Int] = [-1, -2, -3]
-arrayOfNegativeInt.map(numericCast) as [UInt] // 🧞‍ Fatal error: Negative value is not representable
+arrayOfNegativeInt.map(numericCast) as [UInt] // 🧞‍ Fatal error: 음수는 표현할 수 없습니다
 ```
 
+컴파일 시간 타입 기능의 런타임과 같은 `numericCast(_:)` 는 `as!` 보다는 `as` 나 `as?` 에 가깝습니다.
 
-As a run-time approximation of compile-time type functionality `numericCast(_:)` is closer to `as!` than `as` or `as?`.
-
-
-Compare this to what happens if you instead pass the exact conversion initializer, `init?(exactly:)`:
+대신에 exact conversion initializer(`init?(exactly:)`)를 넘겼을 경우를 비교해보겠습니다.
 
 ```swift
 let arrayOfNegativeInt: [Int] = [-1, -2, -3]
 arrayOfNegativeInt.map(UInt.init(exactly:)) // [nil, nil, nil]
 ```
 
+`numericCast(_:)` 는 무딘 도구라서 사용하기로 마음먹었을 때 무엇을 넘겨줘야하는지 이해하는 것이 중요합니다.
 
-`numericCast(_:)`, like its underlying range-checked conversion, is a blunt instrument, and it's important to understand what tradeoffs you're making when you decide to use it.
-
-
-## The Cost of Being Right
+## 올바르기 위한 비용
 
 
 In Swift, the general guidance is to use `Int` for integer values (and `Double` for floating-point values) unless there's a _really_ good reason to use a more specific type.
