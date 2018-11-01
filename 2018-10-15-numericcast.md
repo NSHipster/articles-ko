@@ -17,17 +17,17 @@ status:
 작문에 비유한다면 그 프로그램이 시인지 산문인지 문제는 의심의 여지도 없습니다.
 또는 프로그래밍이 음악이라면 분명히 재즈일 것입니다.
 
-지금 우리가 하고 있는 얘기는 중동지역의 이야기인 _천일야화_(The Thousand and One Nights)와 가장 비슷하다고 생각합니다. 천일야화의 아무 이야기 하나를 읽어보면 초자연적인 존재인 지니(<dfn>jinn</dfn>, <dfn>djinn</dfn>, <dfn>genies</dfn> 또는 🧞‍)를 볼 수 있을 것입니다.
+지금 우리가 하는 얘기는 중동지역의 이야기인 _천일야화_(The Thousand and One Nights)와 가장 비슷하다고 생각합니다. 천일야화의 아무 이야기 하나를 읽어보면 초자연적인 존재인 지니(<dfn>jinn</dfn>, <dfn>djinn</dfn>, <dfn>genies</dfn> 또는 🧞‍)를 볼 수 있을 것입니다.
 이 존재를 뭐라고 부르든 우리는 이 존재가 소원을 이뤄주고 그에 필연적으로 따라오는 불행을 알고 있습니다.
 
 많은 방면에서 컴퓨터는 형이상학적 소원을 물리적으로 구체화해서 성취해줍니다.
-지니처럼 컴퓨터는 우리의 의도가 무엇인지에 상관없이 기쁘게 받아들이고 무엇이든 할 것입니다.
+지니처럼 컴퓨터는 우리의 의도가 무엇인지에 상관없이 기쁘게 받아들이고, 무엇이든 할 것입니다.
 그리고 에러가 발생하기 전까지 우리는 그것에 대해 아무것도 할 수 없을 수도 있습니다.
 
-Swift 개발자라면 정수형 변환 에러를 본 적이 있을 것입니다. 저는 이 에러를 볼 때 마다 "이 경고들 좀 사라지고 내 코드도 컴파일되면 좋겠네"라고 생각합니다.
+Swift 개발자라면 정수형 변환 에러를 본 적이 있을 것입니다. 저는 이 에러를 볼 때마다 "이 경고들 좀 사라지고 내 코드도 컴파일되면 좋겠네"라고 생각합니다.
 
 여러분도 그런 적이 있으시다면 `numericCast(_:)` 을 알기 딱 좋은 타이밍이십니다. `numericCast(_:)` 는 Swift 표준 라이브러리의 작은 유틸리티 기능이지만 우리가 원하는 딱 그 기능입니다.
-하지만 조심하세요 이건 그저 실현되는 것 뿐이니까요.
+기억하세요. 이건 그저 실현되는 것뿐입니다.
 
 ---
 
@@ -39,12 +39,12 @@ public func numericCast<T : BinaryInteger, U : BinaryInteger>(_ x: T) -> U {
 }
 ```
 
-([`Never`](/never)에서도 배웠듯이 코드가 많다고 많은 충격을 주는 것이 아니고 코드가 적다고 주는 충격이 작은게 아닙니다)
+([`Never`](/never)에서도 배웠듯이 코드가 많다고 큰 충격을 주는 것이 아니고 코드가 적다고 주는 충격이 작은 게 아닙니다)
 
-[`BinaryInteger`](https://developer.apple.com/documentation/swift/binaryinteger) 프로토콜은 숫자들이 언어안에서 어떻게 작동되고 있는지 검사하기 위해 Swift 4에서 추가되었습니다.
+[`BinaryInteger`](https://developer.apple.com/documentation/swift/binaryinteger) 프로토콜은 숫자들이 언어 안에서 어떻게 작동되고 있는지 검사하기 위해 Swift 4에서 추가되었습니다.
 `BinaryInteger` 는 signed, unsigned에 상관없이 모든 모양과 모든 사이즈의 정수를 다루는 하나의 통합된 인터페이스를 제공합니다.
 
-정수형을 다른 타입으로 변형할 때는 그 타입으로 표현이 안되는 값이라도 변형은 가능합니다.
+정수형을 다른 타입으로 변형할 때는 그 타입으로 표현이 안 되는 값이라도 변형은 가능합니다.
 문제는 signed 정수를 unsigned 정수로 변형하려고 할 경우 (예를 들어 `-42` 를 `UInt` 로 변형하려고 할 때) 또는 바꾸고자하는 타입의 한계를 넘어가는 경우(예를 들어 `UInt8` 은 `0` 부터 `255` 까지밖에 표현하지 못합니다)에 발생합니다.
 
 `BinaryInteger` 는 변형에 대한 네 가지 전략을 세웠습니다.
@@ -121,40 +121,32 @@ arrayOfNegativeInt.map(UInt.init(exactly:)) // [nil, nil, nil]
 
 `numericCast(_:)` 는 무딘 도구라서 사용하기로 마음먹었을 때 무엇을 넘겨줘야하는지 이해하는 것이 중요합니다.
 
-## 올바르기 위한 비용
+## The Cost of Being Right
 
+Swift에서 정수 값에 `Int` 를 사용하도록(그리고 부동 소숫점 값에 `Double`을 사용하도록) 가이드를 주는 것은 _정말로_ 좋은 이유가 아니라면 구체적인 타입을 사용하지 않게 하기 위해서 입니다.
+`Collection` 의 `count` 값이 정의상으로 무조건 0보다 클지라도 우리는 API에서 잘 못 보낼 수도 있는 경우를 생각해서 `UInt` 대신에 `Int` 를 사용해야 합니다.
+동일한 이유로 아주 적은 숫자를 나타내는 경우에 8 비트 공간에 모든 값이 들어갈지라도 `Int` 를 사용하는 것이 항상 더 나은 표현 방법입니다. 예를 들면 [weekday numbers](/datecomponents)가 있겠네요.
 
-In Swift, the general guidance is to use `Int` for integer values (and `Double` for floating-point values) unless there's a _really_ good reason to use a more specific type.
-Even though the `count` of a `Collection` is nonnegative by definition, we use `Int` instead of `UInt` because the cost of going back and forth between types when interacting with other APIs outweighs the potential benefit of a more precise type.
-For the same reason, it's almost always better to represent even small numbers, like [weekday numbers](/datecomponents),
-with an `Int`, despite the fact that any possible value would fit into an 8-bit integer with plenty of room to spare.
+이러한 경우는 C API와 Swift간의 의사소통에서도 볼 수 있습니다.
 
+오래돼고 낮은 단계의 C API들은 아키텍쳐 의존 타입 정의와 미세하게 조정된 값들로 가득 차 있습니다.
+그들은 스스로 관리가 가능합니다.
+하지만 헤더에서 포인터와 같이 상호 운용성 문제로 올라가게 되면 이것은 브레이크 포인트가 될 수도 있습니다. (디버깅의 그것을 말하는게 아닙니다.)
 
-The best argument for this practice is a 5-minute conversation with a C API from Swift.
+`numericCast(_:)` 는 더 이상 빨간 줄을 보기 싫고 그냥 다 해결됐으면 좋겠으면 하는 우리를 위해 존재합니다.
 
+## 컴파일의 무작위 행동
 
-Older and lower-level C APIs are rife with architecture-dependent type definitions and finely-tuned value storage.
-On their own, they're manageable.
-But on top of all the other inter-operability woes like headers to pointers, they can be a breaking point for some (and I don't mean the debugging kind).
+[공식 문서의 예제](https://developer.apple.com/documentation/swift/2884564-numericcast)는 우리에게 아주 친근한 내용입니다.
 
-
-`numericCast(_:)` is there for when you're tired of seeing red and just want to get things to compile.
-
-
-## Random Acts of Compiling
-
-
-The [example in the official docs](https://developer.apple.com/documentation/swift/2884564-numericcast) should be familiar to many of us:
-
-
-Prior to [SE-0202](https://github.com/apple/swift-evolution/blob/master/proposals/0202-random-unification.md), the standard practice for generating numbers in Swift (on Apple platforms) involved importing the `Darwin` framework and calling the `arc4random_uniform(3)` function:
+[SE-0202](https://github.com/apple/swift-evolution/blob/master/proposals/0202-random-unification.md)에 앞서, Swift에서 숫자를 생성하는 표준 예제는 `Darwin` 프레임워크를 가져와서 `arc4random_uniform(3)` 함수를 사용합니다.
 
 ```c
 uint32_t arc4random_uniform(uint32_t __ upper_bound)
 ```
 
-
-`arc4random` requires not one but two separate type conversions in Swift: first for the upper bound parameter (`Int` → `UInt32`) and second for the return value (`UInt32` → `Int`):
+Swift에서 `arc4random` 를 사용하려면 두 번의 타입 변형을 필요로 합니다.
+첫 번째는 `Int` 값을 `UInt32` 로 변형하고, 다음은 `UInt32` 를 `Int` 로 다시 변형하는 것입니다.
 
 ```swift
 import Darwin
@@ -164,11 +156,9 @@ func random(in range: Range<Int>) -> Int {
 }
 ```
 
+_끔찍하네요._
 
-_Gross._
-
-
-By using `numericCast(_:)`, we can make things a little more readable, albeit longer:
+`numericCast(_:)` 를 사용하면 코드를 더 가독성 있게 만들 수 있습니다.
 
 ```swift
 import Darwin
@@ -178,37 +168,27 @@ func random(in range: Range<Int>) -> Int {
 }
 ```
 
+지니의 소원을 기억하세요. 우리는 우리의 소원을 항상 경계해야 합니다.
 
-`numericCast(_:)` isn't doing anything here that couldn't otherwise be accomplished with type-appropriate initializers.
-Instead, it serves as an indicator that the conversion is perfunctory --- the minimum of what's necessary to get the code to compile.
-
-
-But as we've learned from our run-ins with genies, we should be careful what we wish for.
-
-
-Upon closer inspection, it's apparent that the example usage of `numericCast(_:)` has a critical flaw:
-_it traps on values that exceed `UInt32.max`!_
+더 자세히 살펴보면 `numericCast(_:)` 의 예제에는 치명적인 결함이 있습니다.
+바로 _`UInt32.max` 를 넘는 값이 오면 문제가 생긴다는 것이죠!_
 
 ```swift
-random(in: 0..<0x1_0000_0000) // 🧞‍ Fatal error: Not enough bits to represent the passed value
+random(in: 0..<0x1_0000_0000) // 🧞‍ Fatal error: 넘겨진 값을 표현할 비트가 충분하지 않습니다. (Not enough bits to represent the passed value)
 ```
 
-
-If we [look at the Standard Library implementation](https://github.com/apple/swift/blob/7f7b4f12d3138c5c259547c49c3b41415cd4206e/stdlib/public/core/Integers.swift#L2537-L2560) that now lets us do `Int.random(in: 0...10)`, we'll see that it uses clamping, rather than range-checked, conversion.
-And instead of delegating to a convenience function like `arc4random_uniform`, it [populates values from a buffer of random bytes](https://github.com/apple/swift/blob/7f7b4f12d3138c5c259547c49c3b41415cd4206e/stdlib/public/core/Random.swift#L156-L177).
+[표준 라이브러리의 구현 방식](https://github.com/apple/swift/blob/7f7b4f12d3138c5c259547c49c3b41415cd4206e/stdlib/public/core/Integers.swift#L2537-L2560)에 따르면 이제 `Int.random(in: 0...10)` 을 사용할 수 있게 되었고 여기선 range-checked conversion이 아닌 clamping conversion을 사용하는 것을 알 수 있습니다.
+그리고 `arc4random_uniform` 같은 간편한 함수를 delegate하는 대신에 [무작위 바이트의 버퍼에서 값을 뽑아냅니다](https://github.com/apple/swift/blob/7f7b4f12d3138c5c259547c49c3b41415cd4206e/stdlib/public/core/Random.swift#L156-L177).
 
 ---
 
+코드를 컴파일되게 하는 것은 올바르게 짜는 것과는 다른 일입니다.
+하지만 때론 전자를 추구하는 것이 후자를 이루는 궁극적인 방법이 될 때도 있습니다.
+현명하게 사용한다면 `numericCast(_:)` 는 이슈를 빠르게 해결할 수 있는 간편한 도구가 될 것입니다.
+또한 기존 타입 initializer보다 잠재적인 오작동을 명확하게 알려주는 이점이 있습니다.
 
-Getting code to compile is different than doing things correctly.
-But sometimes it takes the former to ultimately get to the latter.
-When used judiciously, `numericCast(_:)` is a convenient tool to resolve issues quickly.
-It also has the added benefit of signaling potential misbehavior more clearly than a conventional type initializer.
-
-
-Ultimately, programming is about describing _exactly_ what we want --- often with painstaking detail.
-There's no genie-equivalent CPU instruction for "Do the Right Thing"
-(and even if there was,
-[would we really trust it](https://github.com/FixIssue/FixCode)?)
-Fortunately for us, Swift allows us to do this in a way that's safer and more concise than many other languages.
-And honestly, who could wish for anything more?
+프로그래밍은 궁극적으로 우리가 원하는 것을 _정확하게_ 표현해내는 것이라고 생각합니다. 종종 골치 아픈 세부 사항이 있지만요.
+CPU에는 지니같은 "올바른 일을 해라"같은 지시사항은 존재하지 않습니다.
+(만일 있다고 해도 [실제로 믿을만 할까요](https://github.com/FixIssue/FixCode)?)
+다행히도 Swift는 다른 많은 언어들보다 안전하고 간결한 방식으로 이러한 작업을 수행할 수 있습니다.
+이보다 더 많은 것을 원하는 사람이 있을까요?
