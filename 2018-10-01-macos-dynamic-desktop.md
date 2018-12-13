@@ -2,7 +2,7 @@
 title: macOS Dynamic Desktop
 author: Mattt
 translator: 김필권
-category: ""
+category: Miscellaneous
 excerpt: >
   다크 모드는 macOS Mojave의 가장 유명한 기능 중 하나입니다. 특히 우리 개발자들에게는요.
   이 기능과 Night Shift를 통해 유추해본다면 Dynamic Desktop은 충분히 나올 수 있는 기능이었습니다.
@@ -49,12 +49,12 @@ macOS Mojave를 설치하셨다면 파인더를 열고 "이동 > 폴더로 이�
 아쉽게도 이게 미리보기가 우리에게 제공할 수 있는 모든 정보입니다. (지금 이 글을 적고있는 지금까지는요.)
 다음 패널인 "추가 정보"를 선택하면 우리의 주제에 대한 더 많은 정보를 얻을 수 있습니다.
 
-|              |            |
-| ------------ | ---------- |
-| Color Model (색상 모델)  | RGB        |
-| Depth (심도)  | 8          |
-| Pixel Height (픽셀 높이) | 2,880      |
-| Pixel Width (픽셀 너비) | 5,120      |
+|                              |            |
+| ---------------------------- | ---------- |
+| Color Model (색상 모델)      | RGB        |
+| Depth (심도)                 | 8          |
+| Pixel Height (픽셀 높이)     | 2,880      |
+| Pixel Width (픽셀 너비)      | 5,120      |
 | Profile Name (프로파일 이름) | Display P3 |
 
 {% info %}
