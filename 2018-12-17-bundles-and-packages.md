@@ -3,12 +3,12 @@ title: Bundles and Packages
 author: Mattt
 translator: 김필권
 category: Cocoa
-excerpt: "In this season of giving, let's stop to consider one of the greatest gifts given to us by modern computer systems: the gift of abstraction."
+excerpt: "선물이 오가는 시기네요! 오늘은 현대 컴퓨터 시스템이 선사한 가장 훌륭한 선물인 추상화에 대해 생각해보겠습니다."
 status:
   swift: "4.2"
 ---
 
-선물이 오가는 시기네요! 오늘은 현대 컴퓨터 시스템이 선사한 가장 훌륭한 선물인 _추상화라는 선물_ 에 대해 생각해보겠습니다.
+선물이 오가는 시기네요! 오늘은 현대 컴퓨터 시스템이 선사한 가장 훌륭한 선물인 _추상화_ 에 대해 생각해보겠습니다.
 
 컴퓨터나 모바일 기기를 매일 사용하는 사람은 수십억명입니다. 그들은 수백만개의 CPU 트랜지스터와 SSD 셀렉터 그리고 LCD 픽셀에 대해서 생각하지 않습니다. 이 모든 것은 파일, 디렉토리, 앱과 도큐먼트같은 추상화덕분입니다.
 
@@ -126,62 +126,38 @@ $ find . \( -name "*.swift" !           \ # 모든 스위프트 파일을 찾는
   xargs -0 genstrings -o .              \ # 구분자를 모두 NUL로 변경합니다
 ```
 
-## Packages
+## 패키지
 
-Packages are primarily for **improving user experience**
-by encapsulating and consolidating related resources into a single unit.
+패키지는 관련있는 자원들을 하나의 유닛으로 압축시키고 연결시키는 작업을 통해 **사용자 경험을 향상시키기 위해** 만들어졌습니다.
 
-A directory is considered to be a package by the Finder
-if any of the following criteria are met:
+다음과 같은 조건이 맞다면 디렉토리는 파인더에 의해 만들어진 패키지라고 생각할 수 있습니다.
 
-- The directory has a special extension like `.app`, `.playground`, or `.plugin`
-- The directory has an extension that an app has registered as a document type
-- The directory has an extended attribute designating it as a package <sup>\*</sup>
+- 디렉토리에 `.app`, `.playground`, 또는 `.plugin`과 같은 특별한 확장자를 가지고 있는 파일이 있다.
+- 디렉토리에 도큐먼트 타입으로 등록된 앱의 확장자가 존재한다.
+- 디렉토리에 그 자체를 패키지<sup>\*</sup>로 보여지게하는 확장된 어트리뷰트가 존재한다.
 
-### Accessing the Contents of a Package
+### 패키지의 컨텐츠에 접근하기
 
-In Finder,
-you can control-click to show a contextual menu
-with actions to perform on a selected item.
-If an item is a package,
-"Show Package Contents" will appear at the top,
-under "Open".
+우리는 파인더에서 컨트롤 클릭을 통해 선택된 아이템과 관련있는 모든 액션 메뉴를 볼 수 있습니다.
+만약 아이템이 패키지라면 "Show Package Contents" 가 "Open" 바로 밑에 나올 것입니다.
 
 {% asset show-package-contents.png %}
 
-Selecting this menu item will open a new Finder window
-from the package directory.
+이 메뉴를 누르면 패키지 디렉토리가 새로운 파인더 윈도우에서 열립니다.
 
-You can, of course,
-access the contents of a package programmatically, too.
-The best option depends on the kind of package:
+당연히 패키지의 컨텐츠를 코드로 접근할 수도 있습니다.
+패키지에 가장 알맞은 방법은 패키지의 종류에 따라 다릅니다.
 
-- If a package has bundle structure,
-  it's usually easiest to use
-  [`Bundle`](https://developer.apple.com/documentation/foundation/bundle)
-  as described in the previous section.
-- If a package is a document, you can use
-  [`NSDocument`](https://developer.apple.com/documentation/appkit/nsdocument) on macOS
-  and [`UIDocument`](https://developer.apple.com/documentation/uikit/uidocument) on iOS.
-- Otherwise, you can use
-  [`FileWrapper`](https://developer.apple.com/documentation/foundation/filewrapper)
-  to navigate directories, files, and symbolic links,
-  and [`FileHandler`](https://developer.apple.com/documentation/foundation/filehandle)
-  to read and write to file descriptors.
+- 가장 쉬운 경우는 패키지가 번들 구조를 가지고 있을 때입니다. 이때는 이전 섹션에서 설명드렸던 [`Bundle`](https://developer.apple.com/documentation/foundation/bundle)를 사용하면 됩니다.
+- 패키지가 도큐먼트라면 macOS에선 [`NSDocument`](https://developer.apple.com/documentation/appkit/nsdocument)를, iOS에선 [`UIDocument`](https://developer.apple.com/documentation/uikit/uidocument)를 사용하시면 됩니다.
+- 디렉토리, 파일 그리고 심볼 링크들을 접근하려면 [`FileWrapper`](https://developer.apple.com/documentation/foundation/filewrapper)를 사용하면 되고 파일 설명을 읽으려면 [`FileHandler`](https://developer.apple.com/documentation/foundation/filehandle)를 사용하면 됩니다.
 
-### Determining if a Directory is a Package
+### 디렉토리가 패키지인지 결정하는 방법
 
-Although it's up to the Finder how it wants to represent files and directories,
-most of that is delegated to the operating system
-and the services responsible for managing
-Uniform Type Identifiers (<abbr title="Uniform Type Identifiers">UTI</abbr>).
+디렉토리가 패키지인지 결정하는 방법이 파인더가 그들의 파일과 디렉토리를 어떻게 표현하려는지에 달려있다고 하더라도 대부분 운영 체제에 의해 결정되는 것이고 이러한 서비스는 Uniform Type Identifiers를 관리하는 역할을 가집니다.
 
-If you want to determine whether a file extension
-is one of the built-in system package types
-or used by an installed app as a registered document type,
-you can use the Core Services functions
-`UTTypeCreatePreferredIdentifierForTag(_:_:_:)` and
-`UTTypeConformsTo(_:_:)`:
+파일의 확장자를 내장된 시스템 패키지 타입으로 할 지 아니면 등록된 도큐먼트 타입으로 설치된 앱에서 사용할 지 결정하려고 한다면 Core Service의 함수인 `UTTypeCreatePreferredIdentifierForTag(_:_:_:)`와
+`UTTypeConformsTo(_:_:)`를 사용하면 됩니다.
 
 ```swift
 import Foundation
@@ -206,13 +182,7 @@ directoryIsPackage(xcode) // true
 
 {% info %}
 
-We couldn't find any documentation describing
-how to set the so-called "package bit" for a file,
-but according to
-[CarbonCore/Finder.h](https://opensource.apple.com/source/CarbonHeaders/CarbonHeaders-8A428/Finder.h),
-this can be accomplished by setting the
-`kHasBundle` (`0x2000`) flag
-in the `com.apple.FinderInfo` extended attribute:
+저희는 파일의 "패키지 비트(Package Bit)"라고 불리는 것을 설정하는 방법에 대해 설명한 문서를 찾지 못했지만 [CarbonCore/Finder.h](https://opensource.apple.com/source/CarbonHeaders/CarbonHeaders-8A428/Finder.h)에 따르면 이는 `com.apple.FinderInfo`의 확장 어트리뷰트인 `kHasBundle` (`0x2000`) 플래그를 설정하는 것으로 해낼 수 있다고 합니다.
 
 ```terminal
 $ xattr -wx com.apple.FinderInfo /path/to/package \
@@ -224,17 +194,6 @@ $ xattr -wx com.apple.FinderInfo /path/to/package \
 
 ---
 
-As we've seen,
-it's not just end-users that benefit from abstractions ---
-whether it's the safety and expressiveness of
-a high-level programming language like Swift
-or the convenience of APIs like Foundation,
-we as developers leverage abstraction to make great software.
+글에서 보았듯이 추상화를 하는 것의 이익을 얻는 것은 엔드 유저만이 아닙니다. Swift같은 안전하고 표현이 풍부한 하이 레벨 프로그래밍 언어이거나 Foundation과 같은 편한 API를 쓰는 것에도 우리 개발자들은 추상화의 영향을 받아 더 나은 소프트웨어를 만들고 있습니다.
 
-For all that we may (rightfully) complain
-about abstractions that are
-[leaky](https://en.wikipedia.org/wiki/Leaky_abstraction) or
-[inverted](https://en.wikipedia.org/wiki/Abstraction_inversion),
-it's important to take a step back
-and realize how many useful abstractions we deal with every day,
-and how much they allow us to do.
+우리가 만나는 [leaky](https://en.wikipedia.org/wiki/Leaky_abstraction)하고 [inverted](https://en.wikipedia.org/wiki/Abstraction_inversion)한 추상화에 대해 불평할 때 한 발짝 물러서서 얼마나 많은 추상화들이 우리가 할 수 있는 일을 얼마나 많이 늘려주는지 생각해본다면 어떨까요?
