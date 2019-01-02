@@ -1,5 +1,5 @@
 ---
-title: Bundles and Packages
+title: 번들과 패키지
 author: Mattt
 translator: 김필권
 category: Cocoa
