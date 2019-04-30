@@ -223,7 +223,7 @@ Swift 4.1에서 `flatMap` 이 `compactMap` 으로 대체되었다는 오해가 �
 [`Sequence` 에서 `Optional` 요소를 `flatMap` 하는 것처럼 특별한 케이스만 삭제되었습니다](https://github.com/apple/swift-evolution/blob/master/proposals/0187-introduce-filtermap.md#motivation).
 {% endwarning %}
 
-Because it passes errors through in this manner, we can use `flatMap` to combine our operations together without checking for `.failure` each step of the way. This lets us minimize nesting and keep our error handling and operations distinct:
+이러한 규칙을 지키며 에러를 보내기 때문에 각 단계의 `.failure` 를 생각하지 않고 `flatMap` 을 사용해서 연산을 합성할 수 있습니다. 이러한 방식은 우리의 코드에 중첩을 최소화해주고 에러 핸들링과 연산을 분리할 수 있게 해줍니다.
 
 ```swift
 let result = keychainData(service: "UserData")
@@ -232,7 +232,7 @@ let result = keychainData(service: "UserData")
 
 switch result {
 case .success:
-  break // continue on with our program...
+  break
 
 case .failure(KeychainError.notFound(let name)):
   print(""\(name)" not found in keychain.")
@@ -244,11 +244,17 @@ case .failure(FileSystemError.readOnly):
 }
 ```
 
-This is, without a doubt, an improvement. But it requires us (and anyone reading our code) to be familiar enough with `.flatMap` to follow its somewhat unintuitive semantics.
+코드 품질이 향상됐다는 것엔 의심의 여지가 없네요. 하지만 이는 코드를 읽는 사람이 `.flatMap` 를 알아야해서 덜 직관적이게 될 것입니다.
 
-{% warning %} And this is a best case scenario of perfect composability (the resulting value of the first operation being the required parameter of the next, and so on). What if an operation takes no parameters? Or requires more than one? Or takes a parameter of a different type than we're returning? `flatMap`ing across those sorts of beasts is… less elegant. {% endwarning %}
+{% warning %}
+지금까지의 내용은 완벽한 결합성(Composability)의 최적화된 시나리오입니다. (첫 연산의 출력이 두 번째 연산의 입력이 되고, 두 번째 연산의 출력이 세 번째 연산의 입력이 되는 것처럼 이어지는 속성)
+만약 연산자가 아무것도 받지 않는다면 어떨까요?
+아니면 하나 이상의 값을 필수로 받는다면 어떨까요?
+또는 각 연산이 입력으로 받는 값과 출력으로 내보내는 값들이 서로 타입이 다른 경우엔 어떨까요?
+우아하지 않을 수 있지만 이런 경우에 `flatMap` 을 하면 해결이 가능합니다.
+{% endwarning %}
 
-Compare this to the `do/catch` syntax from all the way back in Swift 2 that we alluded to a little earlier:
+비교를 위해 앞서 짠 코드를 Swift 2에 추가된 `do/catch` 방식으로 작성해보겠습니다.
 
 ```swift
 do {
@@ -267,32 +273,29 @@ do {
 } <#...#>
 ```
 
-The first thing that might stand out is how similar these two pieces of code are. They both have a section up top for executing our operations. And both have a section down below for matching errors and handling them.
+첫 번째로 생각해야 할 내용은 두 코드가 얼마나 비슷한지 살펴보는 것입니다. 둘 다 위쪽에 연산하는 코드가 있고 아래쪽에 에러 핸들링 하는 부분이 있는 것이 비슷하네요.
 
-{% info %} This similarity is not accidental. Much of Swift's error handling [is sugar around returning and unwrapping `Result`-like types](https://twitter.com/jckarter/status/608137115545669632). As we'll see more of in a bit… {% endinfo %}
+{% info %}
+두 코드가 비슷하게 생긴 것은 우연이 아닙니다. Swift의 에러 핸들링의 대부분이 [`Result` 와 비슷한 타입을 반환하거나 벗겨내는 일을 좀 더 쉽게 해주는 것](https://twitter.com/jckarter/status/608137115545669632)이었습니다.
+계속 살펴보시죠...
+{% endinfo %}
 
-Whereas the `Result` version has us piping operations through chained calls to `flatMap`,
-we write the `do/catch` code more or less exactly as we would if no error handling were involved.
-While the `Result` version requires we understand the internals of its enumeration
-and explicitly `switch` over it to match errors,
-the `do/catch` version lets us focus on the part we actually care about:
-the errors themselves.
+`Result` 버전은 `flatMap` 을 통해서 연산자들끼리 연결이 돼있는 반면에 `do/catch` 코드는 에러 핸들링이 일어나도록 하기 위해 `try` 를 계속 사용했습니다.
+`Result` 버전은 내부 열거형을 알아야 하고 그를 통해 `switch` 문을 사용해야 했지만 `do/catch` 버전은 에러 자체에 더 집중할 수 있도록 해줍니다.
 
-By having language-level syntax for error handling, Swift effectively masks all the `Result`-related complexities it took us the first half of this post to digest: enumerations, associated values, generics, flatMap, monads… In some ways, Swift added error-handling syntax back in version 2 specifically so we wouldn't have to deal with `Result` and its eccentricities.
+새로 생긴 에러 핸들링 문법은 `Result` 와 관련된 복잡한 내용들을 효과적이게 없애긴하지만 이를 사용하려면 열거형, associated value, 제네릭, flatMap, 모나드 등을 학습해야 합니다...
+Swift 2에 추가된 에러 핸들링 방법은 `Result` 와 그외들을 학습하지 않아도 잘 사용할 수 있습니다.
 
-Yet here we are, five years later, learning all about it. Why add it now?
+지난 5년간 그것들을 다 익히셨다면 추가하지 않을 이유가 없겠죠?
 
 ## Error's Ups and Downs
 
-Well, as it should happen, `do/catch` has this little thing we might call an achilles heel…
+다른 방법들도 그랬듯이 `do/catch` 방식에도 치명적인 단점이 존재합니다...
 
-See, `throw`, like `return`, only works in one direction; up. We can `throw` an error "up" to the _caller_, but we can't `throw` an error "down" as a parameter to another function _we_ call.
+`throw` 는 마치 한 방향으로만 작동하는 `return` 같습니다. 우리는 호출한 곳에다가 에러를 보내는 것(up)만 할 수 있고 다른 함수에 에러를 파라미터로 보내는 것(down)은 할 수 없습니다.
 
-This "up"-only behavior is typically what we want.
-Our keychain utility,
-rewritten once again with error handling,
-is all `return`s and `throw`s because its only job is passing either our data or an error
-back up to the thing that called it:
+이러한 "up"-only 방식은 일반적으로 우리가 원하는 내용입니다.
+앞써 작성한 키체인 도구의 에러 핸들링을 살펴보면 데이터 혹은 에러를 보내기 위해서 `return` 과 `throw` 들이 난무하는 것을 볼 수 있습니다.
 
 ```swift
 func keychainData(service: String) throws -> Data {
