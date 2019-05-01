@@ -317,28 +317,25 @@ func keychainData(service: String) throws -> Data {
 }
 ```
 
-But what if,
-instead of fetching user data from the keychain,
-we want to get it from a cloud service?
-Even on a fast, reliable connection,
-loading data over a network can take a long time compared to reading it from disk.
-We don't want to block the rest of our application while we wait, of course,
-so we'll make it asynchronous.
+하지만 만약 키체인에서 사용자 데이터를 가져오는 대신에 클라우드 서비스에서 가져온다면 어떨까요?
+빠르고 믿을 수 있는 연결이 제공된다 해도 네트워크 상의 데이터 로딩은 디스크에서 읽어오는 것과 비교한다면 느릴 수 밖에 없습니다.
+당연히 데이터가 오는 동안 앱이 멈추는 것은 원하지 않으시겠죠?
+그러니 비동기로 만들어보겠습니다.
 
-But that means we're no longer returning _anything_ "up".
-Instead we're calling "down" into a closure on completion:
+하지만 비동기로 만든다면 더 이상 호출한 곳으로 반환하는 것(up)을 하지 않을 것이라는 뜻입니다.
+대신에 완료 시에 클로저를 다음으로(down) 호출할 것입니다.
 
 ```swift
 func userData(for userID: String, completion: (Data) -> Void) {
   <#get data from the network#>
-  // Then, sometime later:
+  // 시간이 지난 후 실행
   completion(myData)
 }
 ```
 
-Now network operations can fail with [all sorts of different errors](https://developer.apple.com/documentation/foundation/urlerror),
-but we can't `throw` them "down" into `completion`.
-So the next best option is to pass any errors along as a second (optional) parameter:
+오늘날의 네트워크 연산은 [다양한 종류의 에러](https://developer.apple.com/documentation/foundation/urlerror)로 인해 실패할 수 있습니다.
+하지만 이 모든 에러를 `completion` 에 `throw` 로 넘길 수는 없습니다.
+그러니 가장 좋은 선택지는 에러를 옵셔널 파라미터로 넘기는 것입니다.
 
 ```swift
 func userData(for userID: String, completion: (Data?, Error?) -> Void) {
@@ -350,7 +347,7 @@ func userData(for userID: String, completion: (Data?, Error?) -> Void) {
 }
 ```
 
-But now the caller, in an effort to make sense of this cartesian maze of possible parameters, has to account for many impossible scenarios in addition to the ones we actually care about:
+하지만 이렇게 되면 호출하는 부분에서 우리가 예상했던 시나리오 뿐만 아니라 실행 불가능하다고 생각되는 시나리오에 대해서도 설명해야 합니다.
 
 ```swift
 userData(for: "jemmons") { maybeData, maybeError in
@@ -368,25 +365,25 @@ userData(for: "jemmons") { maybeData, maybeError in
 }
 ```
 
-It'd be really helpful if, instead of this mishmash of "data or nil _and_ error or nil" we had some succinct way to express simply "data _or_ error".
+원래 같았으면 "데이터 또는 nil"과 "에러 또는 nil"가 뒤섞인 것을 보는 대신에 그저 데이터 또는 에러일 경우만 관리할 수 있어서 도움이 많이 됩니다.
 
 ## Stop Me If You've Heard This One…
 
-Wait, data or error?
-That sounds familiar.
-What if we used a `Result`?
+데이터 또는 에러요?
+되게 친숙한 구도네요.
+그렇다면 `Result` 를 써보는 것은 어떨까요?
 
 ```swift
 func userData(for userID: String, completion: (Result<Data, Error>) -> Void) {
-  // Everything went well:
+  // 모든 것이 잘 풀렸을 경우:
   completion(.success(myData))
 
-  // Something went wrong:
+  // 일이 잘 안 풀린 경우:
   completion(.failure(myError))
 }
 ```
 
-And at the call site:
+호출 부분은 다음처럼 될 것입니다
 
 ```swift
 userData(for: "jemmons") { result in
@@ -399,43 +396,34 @@ userData(for: "jemmons") { result in
 }
 ```
 
-Ah ha!
-So we see that the `Result` type can serve as a concrete [reification](https://en.wikipedia.org/wiki/Reification_%28computer_science%29) of Swift's abstract idea of
-_"that thing that's returned when a function is marked as `throws`."_
-And as such, we can use it to deal with asynchronous operations that require concrete types for parameters passed to their completion handlers.
+와!
+코드에서 볼 수 있듯이 `Result` 타입은 "함수가 `throws` 로 표시될 때 리턴되는 것"에 대한 Swift의 추상적인 아이디어를 구체화할 때 사용됩니다.
+우리는 이를 컴플리션 핸들러의 파라미터를 구체적인 타입으로 받는 비동기 연산을 다룰 때 사용할 수 있을 것입니다
 
 {% info %}
-This duality between
-the abstract "error handling thing"
-and concrete "`Result` thing"
-is more than just skin deep — they're two sides of the same coin,
-as illustrated by how trivial it is to convert between them:
+추상적인 에러 핸들링과 구체적인 `Result` 사이의 이중성은 동전의 양 면처럼 서로 바꾸는 것이 아주 사소합니다.
 
 ```swift
 Result { try somethingThatThrows() }
 ```
 
-…turns an abstract catchable thing into a concrete result type that can be passed around.
+이 코드는 catch할 수 있는 추상적인 무언가를 어딘가에 넘길 수 있는 구체적인 result 타입으로 변경합니다.
 
 ```swift
 try someResult.get()
 ```
 
-…turns a concrete result into an abstract thing capable of being caught.
+이 코드는 구체적인 result 타입을 catch할 수 있는 추상적인 무언가로 만들어줍니다.
 {% endinfo %}
 
-So, while the shape of `Result` has been implied by error handling since Swift 2
-(and, indeed, quite a few developers have created [their own versions of it](https://github.com/search?o=desc&q=result+language%3Aswift&s=&type=Repositories) in the intervening years),
-it's now officially added to the standard library in Swift 5 — primarily as a way to deal with asynchronous errors.
+`Result` 의 형태는 Swift 2 이후로 에러 핸들링으로 함축되었던 반면에, 이제는 공식적으로 Swift 5 표준 라이브러리에 주로 비동기 에러를 다루는 곳에서 쓰도록 추가됐습니다.
+(공식적으로 발표되기 전에는 [몇몇 개발자들이 그들만의 버전](https://github.com/search?o=desc&q=result+language%3Aswift&s=&type=Repositories)을 개발했었습니다.)
 
-Which is undoubtedly better than passing the double-optional `(Value?, Error?)` mess we saw earlier.
-But didn't we just get finished making the case that `Result` tended to be overly verbose, nesty, and complex
-when dealing with more than one error-capable call?
-Yes we did.
+앞에서 보았듯이 옵셔널 두 개 `(Value?, Error?)` 를 넘기는 것보다 낫다는 것은 의심할 여지가 없습니다.
+하지만 아직 보여드리지 않은 경우인 둘 이상의 에러가 발생할 수 있는 호출에서 `Result` 를 사용해서 에러를 다루는 방법에 대해 보여드리겠습니다.
 
-And, in fact, this is even more of an issue in the async space
-since `flatMap` expects its transform to return _synchronously_.
-So we can't use it to compose _asynchronous_ operations:
+`flatMap` 은 동시에 변환을 반환하기 때문에 이것은 비동기 공간에서 문제가 생길 수 있습니다.
+그러니 비동기 연산을 합성할 땐 사용할 수 없습니다.
 
 ```swift
 userData(for: "jemmons") { userResult in
@@ -449,7 +437,7 @@ userData(for: "jemmons") { userResult in
 
           switch saveResult {
           case .success:
-            // All done!
+            // 모두 성공!
 
           case .failure(URLError.timedOut)
             print("Operation timed out.")
@@ -469,17 +457,16 @@ userData(for: "jemmons") { userResult in
 }
 ```
 
-{% info %} There is, actually, a `flatMap`-like way of handling this called the [Continuation Monad](https://en.wikipedia.org/wiki/Monad_%28functional_programming%29#Continuation_monad). It's complicated enough, though, that it probably warrants a few blog posts all unto itself. {% endinfo %}
+{% info %}
+실제로 `flatMap` 과 같은 방식의 핸들링도 할 수 있는데, 이는 [Continuation Monad](https://en.wikipedia.org/wiki/Monad_%28functional_programming%29#Continuation_monad)라고 불립니다.
+이는 지금 익히기엔 충분히 복잡해서 이것 하나만으로도 몇 개의 블로그 포스팅이 나올 것입니다.
+{% endinfo %}
 
 ## Awaiting the Future
 
-In the near term, we just have to lump it.
-It's better than the other alternatives native to the language,
-and chaining asynchronous calls isn't as common as for synchronous calls.
+Swift가 동시 에러 처리에서 `Result` 중첩 문제를 정의하기 위해서 `do/catch` 문법을 사용한 것처럼, 비동기 에러 처리에 대해서도 비슷한 제안이 많습니다.
 
-But in the future, just as Swift used `do/catch` syntax to define away `Result` nesting problems in synchronous error handling, there are many proposals being considered to do the same for asynchronous errors (and asynchronous processing, generally).
-
-[The async/await proposal](https://gist.github.com/lattner/429b9070918248274f25b714dcfc7619) is one such animal. If adopted it would reduce the above to:
+[async/await 제안](https://gist.github.com/lattner/429b9070918248274f25b714dcfc7619)은 그 중 하나입니다. 이 제안을 우리 코드에 적용해본다면 다음과 같이 만들 수 있습니다.
 
 ```swift
 do {
@@ -498,7 +485,4 @@ do {
 } <#...#>
 ```
 
-Which, holy moley! As much as I love `Result`, I, for one, cannot wait for it to be made completely irrelevant by our glorious async/await overlords.
-
-Meanwhile? Let us rejoice!
-For we finally have a concrete `Result` type in the standard library to light the way through these, the middle ages of async error handling in Swift.
+여기까지 Swift 에러 핸들링의 어두운 과도기에 길을 밝혀준 `Result` 타입에 대해 알아보았습니다.
