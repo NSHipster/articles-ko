@@ -1,100 +1,59 @@
 ---
-title: SwiftUI Previews on macOS Catalina and Xcode 11
+title: SwiftUI 미리보기
 author: Mattt
+translator: 김필권
 category: Xcode
 excerpt: >-
-  Working on a large iOS codebase often involves a lot of waiting.
-  But with Xcode 11,
-  our wait is finally over ---
-  and it's all thanks to SwiftUI.
+  어마어마한 양의 iOS 코드를 다루는 일은 때론 기다림의 연속입니다.
+  하지만 Xcode 11와 SwiftUI가 함께라면 더 이상 기다릴 필요가 없습니다.
 status:
   swift: 5.1
 ---
 
-Working on a large iOS codebase often involves a lot of waiting:
-Waiting for Xcode to index your files,
-waiting for Swift and Objective-C code to compile,
-waiting for the Simulator to boot and your app to launch...
+어마어마한 양의 iOS 코드를 다루는 일은 때론 Xcode가 파일을 인덱싱하는 것을, Swift와 Objective-C 코드가 컴파일되기를, 시뮬레이터가 켜지고 앱이 실행되기를 기다리는 등 기다림의 연속입니다.
 
-And after all of that,
-you spend even more time getting your app
-into a particular state and onto a particular screen,
-just to see whether the Auto Layout constraint you just added
-fixes that regression you found.
-It didn't, of course,
-so you jump back into Xcode,
-tweak the Content Hugging Priority,
-hit <kbd>⌘</kbd><kbd>R</kbd>,
-and start the whole process again.
+심지어 우리는 방금 추가한 오토 레이아웃 하나 때문에 앱의 특정 상태, 특정 화면을 보기 위해 계속해서 시간을 소비합니다.
+만약 기대한 결과가 나오지 않는다면 다시 Xcode로 돌아가서 Content Hugging 우선 순위를 조정하고 <kbd>⌘</kbd><kbd>R</kbd>을 눌러 모든 과정을 다시 시작합니다.
 
-We might relate our sorry predicament to
-[that one xkcd comic](https://xkcd.com/303/),
-but for those of us who don't so much relish in
-the stop-and-go nature of app development,
-there's an old Yiddish joke about Shlemiel the painter
-_(provided below with a few -specific modifications;
-for the uninitiated,
-please refer to Joel Spolsky's
-[original telling](https://www.joelonsoftware.com/2001/12/11/back-to-basics/))_:
+[이런 상황](https://xkcd.com/303/)을 즐기는 분도 계시겠지만 그렇지 않은 분에겐 [Joel Spolsky가 소개하는](https://www.joelonsoftware.com/2001/12/11/back-to-basics/) 옛날 농담이 생각날 수 있겠네요. 이 농담을 iOS식으로 변형해봤습니다.
 
-> Shlemiel gets a job as a software developer,
-> implementing a new iOS app.
-> On the first sprint he opens Xcode
-> and implements 10 new screens of the app.
-> _"That’s pretty good!"_ says his manager,
-> _"you’re a fast worker!"_ and pays him a Bitcoin.
+> Shlemiel은 iOS 앱을 만드는 개발자가 되었습니다.
+> 그는 첫 스프린트에서 화면 10개를 쳤습니다.
+> 관리자는 _"끝내주네요! 당신은 정말 손이 빠르네요!"_ 라고 하며 비트코인을 주었습니다.
 >
-> The next sprint Shlemiel only gets 5 screens done.
-> _"Well, that’s not nearly as good as yesterday,
-> but you’re still a fast worker. 5 screens is respectable,"_
-> and pays him a Bitcoin.
->
-> The next sprint Shlemiel implements 1 screen.
-> _"Only 1!"_ shouts his manager.
-> _"That’s unacceptable!
-> On the first day you did ten times that much work!
-> What’s going on?"_
->
-> _"I can’t help it,"_ says Shlemiel.
-> <em>"Each sprint I get further and further away from
-> `application(_:didFinishLaunchingWithOptions:)`!"</em>
+> 다음 스프린트에서 그는 5화면밖에 치지 못했습니다.
+> 관리자는 _"흠 저번보다 못하셨네요 하지만 여전히 손은 빠르신 것 같습니다. 화면 5개도 빠른거죠."_ 라고 하며 비트코인을 주었습니다.
+> 
+> 다음 스프린트에서는 화면을 하나밖에 못 쳤습니다.
+> _"하나요?"_ 괸리자는 소리쳤습니다.
+> _"말이 된다고 생각하세요? 처음 스프린트에선 10배나 많은 일을 하셨잖아요. 무슨 일 생기셨나요?"_
+> 
+> _"어쩔 수 없었어요."_ Shlemiel이 말했습니다.
+> <em>"스프린트가 진행될수록 `application(_:didFinishLaunchingWithOptions:)`의 코드가 커져서 어쩔 수가 없었다구요!"</em>
 
-Over the years,
-there have been some developments that've helped things slightly,
-including
-[`@IBInspectable` and `@IBDesignable`](/ibinspectable-ibdesignable/)
-and [Xcode Playgrounds](/xcplayground/).
-But with Xcode 11,
-our wait is finally over ---
-and it's all thanks to SwiftUI.
+지난 몇 년간, 코드를 줄이는 것에 대한 개발은 발전해왔습니다. [`@IBInspectable` and `@IBDesignable`](/ibinspectable-ibdesignable/)과 [Xcode Playgrounds](/xcplayground/)도 그 중 일부라 할 수 있죠.
+드디어 Xcode 11과 함께 끝판왕이 나왔습니다. 바로 SwiftUI입니다.
 
 ---
 
 {% warning %}
 
-The functionality described in this article requires the following:
+이 글에서 소개하는 기능은 다음과 같은 내용을 필요로 합니다.
 
 - **Xcode 11**
 - **macOS Catalina**
-- **iOS 13** set as the **Deployment Target** for your app's **Debug** configuration \\
-  _(In Xcode, navigate your project's Build Settings;
-  under the Deployment heading,
-  expand the iOS Deployment Target setting and set Debug to iOS 13.0 or later)_
+- **Debug** 설정의 **Deployment Target**이 **iOS 13**으로 설정된 앱
 
-Without these three things,
-your code either won't compile or won't render live previews.
+위 세 가지가 충족되지 않으면 여러분의 코드는 컴파일되지도, 미리보기로 실시간 렌더링되지도 않을 것입니다.
 
 {% endwarning %}
 
 ---
 
-Although many of us have taken a [_"wait and see"_ approach](/wwdc-2019/) to SwiftUI,
-we can start using its capabilities **today**
-to radically speed up and improve our development process ---
-_without changing a line of code in our UIKit apps_.
+많은 분들이 아직 SwiftUI를 보고만 있는 상태겠지만, 우리는 이 기술의 가능성을 통해 개발 프로세스를 더 빠르고 더 좋게 향상시킬 것입니다.
+_UIKit 앱의 코드 한 줄 바꾸지 않고 말이죠._
 
-Consider a subclass of `UIButton`
-that draws a border around itself:
+`UIButton`의 서브클래스로 테두리를 그리는 버튼이 있다면 코드는 다음과 같을 것입니다.
 
 ```swift
 final class BorderedButton: UIButton {
@@ -104,14 +63,8 @@ final class BorderedButton: UIButton {
 }
 ```
 
-Normally,
-if we wanted to test how our UI element performs,
-we'd have to add it to a view in our app,
-build and run,
-and navigate to that screen.
-But with Xcode 11,
-we can now see a preview side-by-side with the code editor
-by adding the following under the original declaration of `BorderedButton`:
+보통 우리가 만든 UI가 어떻게 작동하는지 테스트하기 위해서는 뷰의 어딘가에 추가한 후, 빌드, 실행 그리고 그 화면까지 가야했습니다.
+하지만 Xcode 11를 사용하고 있다면 `BorderedButton`의 선언 밑에 다음과 같은 내용을 넣으면 실시간으로 미리보기를 볼 수 있습니다.
 
 <div class="code-with-automatic-preview">
 
@@ -141,29 +94,19 @@ struct BorderedButton_Preview: PreviewProvider {
 
 </div>
 
-Using a new feature called <dfn>dynamic replacement</dfn>,
-Xcode can update this preview without recompiling ---
-within moments of your making a code change.
-This lets you rapidly prototype changes like never before.
+<dfn>동적 대체(dynamic replacement)</dfn>라는 새로운 기능을 사용하면 Xcode는 새로운 컴파일 없이 여러분이 코드를 작성하고 있는 순간과 동시에 미리보기를 업데이트할 수 있게 됩니다.
+이것은 이전에는 생각지도 못한 속도로 프로토타입을 생성할 수 있게 됐다는 의미입니다.
 
-Want to see how your button handles long titles?
-Bang away on your keyboard within the call to `setTitle(_:for:)`
-in your preview,
-and test out potential fixes in your underlying implementation
-without so much as leaving your current file!
+타이틀이 길어졌을 때 여러분의 버튼이 어떻게 바뀔지 궁금하신가요?
+`setTitle(_:for:)`을 호출하는 부분에 원하는 만큼 입력하시고 내 버튼의 잠재력을 느껴보세요. 그것도 작성하던 파일을 벗어나지 않고요!
 
 {% info %}
 
-`UIViewPreview` is a custom, generic structure
-that we created to conveniently host previews of `UIView` subclasses.
-Feel free to [download the source](https://gist.github.com/mattt/ff6b58af8576c798485b449269d43607)
-and add it to your project directly.
+`UIViewPreview`는 `UIView` 서브클래스의 미리보기를 보여줄 수 있는 컨벤션을 지닌 커스텀하면서 제네릭한 구조를 가집니다.
+[소스](https://gist.github.com/mattt/ff6b58af8576c798485b449269d43607)는 gist에 올려두었으니 마음껏 가져가시고 프로젝트에 바로 적용해보세요.
 
-Incorporating a proper dependency would be complicated by
-the conditional import and iOS 13 Deployment Target settings
-required to make Xcode Previews work for non-SwiftUI apps,
-so in this particular instance,
-we think it's best to embed these files directly.
+SwiftUI를 사용하지 않는 앱에서 Xcode Preview를 작동하기 위해서는 조건적인 import를 통해 적절한 디펜던시 사용과 Deployment Target을 iOS 13로 설정하는 작업이 필요합니다.
+이런 경우엔 저 파일을 직접적으로 임베드하는 것이 최고입니다.
 
 {% capture uiviewpreview %}
 
@@ -198,26 +141,21 @@ struct UIViewPreview<View: UIView>: UIViewRepresentable {
 {::nomarkdown}
 
 <details>
-<summary>Expand for the full implementation of <code>UIViewPreview</code>:</summary>
+<summary><code>UIViewPreview</code>의 모든 구현을 보려면 클릭하세요!</summary>
 {{ uiviewpreview | markdownify }}
 </details>
 {:/}
 
 {% endinfo %}
 
-## Previewing Multiple States
+## 다양한 상태 미리보기
 
-Let's say our app had a `FavoriteButton` ---
-a distant cousin (perhaps by composition) to `BorderedButton`.
-In its default state,
-it shows has the title "Favorite"
-and displays a <span title="Heart">♡</span> icon.
-When its `isFavorited` property is set to `true`,
-the title is set to "Unfavorite"
-and displays a <span title="Heart with slash">♡̸</span> icon.
+`FavoriteButton`이라는 버튼이 앱에 있다고 해보겠습니다.
+이 버튼은 아마도 `BorderedButton`의 먼 사촌일 것입니다.
+그리고 기본 상태에선 "Favorite"라는 제목과 <span title="Heart">♡</span> 아이콘을 가질 것입니다.
+만약 `isFavorited` 속성이 `true`가 된다면, 타이틀이 "Unfavorite"로 바뀌고 아이콘은 <span title="Heart with slash">♡̸</span>가 될 것입니다.
 
-We can preview both at once
-by wrapping two `UIViewPreview` instances within a single SwiftUI `Group`:
+SwiftUI의 `Group`을 사용한다면 두 개의 `UIViewPreview` 인스턴스도 동시에 볼 수 있습니다.
 
 <div class="code-with-automatic-preview">
 
@@ -244,24 +182,16 @@ Group {
 
 {% info %}
 
-The chained `previewLayout` and `padding` methods
-apply to each member of the `Group`.
-You can use these and
-[other `View` methods](https://developer.apple.com/documentation/swiftui/view)
-to change the appearance of your previews.
+그룹 끝에 붙어있는 `previewLayout`과 `padding` 메소드는 `Group`의 각 멤버에게 적용됩니다.
+미리보기를 원하는 방식으로 보기 위해 [여러가지 `View` 메소드](https://developer.apple.com/documentation/swiftui/view)가 제공됩니다.
 
 {% endinfo %}
 
-## Previewing Dark Mode
+## 다크 모드에서 미리보기
 
-With [Dark Mode in iOS 13](/dark-mode/),
-it's always a good idea to double-check that your custom views
-are configured with dynamic colors
-or accommodate both light and dark appearance in some other way.
+iOS 13에서 소개된 [다크 모드](/dark-mode/)에서도 여러분의 커스텀 뷰가 잘 나오는지 확인해야겠죠?
 
-An easy way to do this
-would be to use a `ForEach` element
-to render a preview for each case in the `ColorScheme` enumeration:
+다크 모드를 확인할 수 있는 가장 쉬운 방법은 `UIViewPreview`의 `ColorScheme`을 돌면서 하나씩 확인하는 것입니다.
 
 <div class="code-with-automatic-preview">
 
@@ -289,16 +219,13 @@ ForEach(ColorScheme.allCases, id: \.self) { colorScheme in
 
 {% info %}
 
-When rendering previews with `ForEach`,
-use the `previewDisplayName` method to help distinguish among
-all of the enumerated values.
+`ForEach`를 사용해서 미리보기를 렌더링할 때는 `previewDisplayName` 메소드를 사용해서 각 컬러 스킴의 이름을 출력해서 구별할 수 있게 하는 것이 좋습니다.
 
 {% endinfo %}
 
-## Previewing Dynamic Type Size Categories
+## 동적 타입의 사이즈별 미리보기
 
-We can use the same approach to preview our views in various
-[Dynamic Type Sizes](https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/):
+다양한 [동적 타입 사이즈(Dynamic Type Size)](https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/)의 뷰를 미리보기하는 것도 비슷한 접근법을 사용하면 됩니다.
 
 <div class="code-with-automatic-preview">
 
@@ -323,18 +250,13 @@ ForEach(ContentSizeCategory.allCases, id: \.self) { sizeCategory in
 
 </div>
 
-## Previewing Different Locales
+## 서로 다른 지역별 미리보기
 
-Xcode Previews are especially time-saving when it comes to
-localizing an app into multiple languages.
-Compared to the hassle of configuring Simulator
-back and forth between different languages and regions,
-this new approach makes a world of difference.
+Xcode Preview는 앱을 다양한 언어로 로컬라이징할 때 그 진가가 발휘됩니다.
+시뮬레이터의 언어와 지역 설정을 바꿨다가 되돌렸다가 하던 것에 비교하면 천지차이입니다.
 
-Let's say that, in addition to English,
-your app supported various [right-to-left languages](https://en.wikipedia.org/wiki/Right-to-left).
-You could verify that your
-<abbr title="Right-to-Left">RTL</abbr> logic worked as expected like so:
+여러분의 앱이 기본적으로 영어를 지원하고 있는데 [오른쪽에서 왼쪽으로 쓰는 언어](https://en.wikipedia.org/wiki/Right-to-left)를 지원해야 하는 상황을 예로 들어보겠습니다.
+아래와 같이 할 수 있겠네요.
 
 <div class="code-with-automatic-preview">
 
@@ -370,24 +292,15 @@ return ForEach(supportedLocales, id: \.identifier) { locale in
 
 {% info %}
 
-We don't know of an easy way to use `NSLocalizedString` with an explicit locale.
-You could go to the trouble of retrieving localized strings
-from a strings file in your bundle,
-but in most cases,
-you'll be just fine hard-coding text in your previews.
+`NSLocalizedString`을 통해서 로컬라이제이션 테스트를 제대로 하는 것은 쉽지 않습니다.
+하지만 미리보기와 함께라면 원하는 텍스트를 하드코딩해서 테스트할 수 있습니다.
 
 {% endinfo %}
 
-## Previewing View Controllers on Different Devices
+## 서로 다른 기기에서 뷰 컨트롤러 미리보기
 
-SwiftUI previews aren't limited to views,
-you can also use them with view controllers.
-By creating a [custom `UIViewControllerPreview` type](https://gist.github.com/mattt/ff6b58af8576c798485b449269d43607)
-and taking advantage of some
-[new `UIStoryboard` class methods in iOS 13](https://nshipster.com/ios-13/#remove-implicitly-unwrapped-optionals-from-view-controllers-initialized-from-storyboards),
-we can easily preview our view controller
-on various devices ---
-one on top of another:
+SwiftUI의 미리보기는 뷰에만 국한된 기능이 아닙니다. 이 기능은 뷰 컨트롤러에도 사용할 수 있습니다.
+[커스텀 `UIViewControllerPreview` 타입](https://gist.github.com/mattt/ff6b58af8576c798485b449269d43607)을 생성하면 [iOS 13의 새로운 `UIStoryboard` 클래스 메소드](https://nshipster.com/ios-13/#remove-implicitly-unwrapped-optionals-from-view-controllers-initialized-from-storyboards)의 이점을 얻어서 서로 다른 기기에서 뷰 컨트롤러를 미리보기할 수 있습니다.
 
 <div class="code-with-automatic-preview">
 
@@ -426,34 +339,22 @@ struct ViewController_Preview: PreviewProvider {
 
 {% error %}
 
-There's currently no way to get SwiftUI device previews in landscape orientation.
-Although you can approximate this with a fixed size preview layout,
-be aware that it won't respect Safe Area on iPhone
-or render split views correctly on iPad.
+단점이 하나 있다면 가로 모드에서는 SwiftUI 기기 미리보기를 할 방법이 없다는 것입니다.
+하지만 미리보기 레이아웃을 특정한 사이즈로 고정시키면 가로 모드를 비슷하게 확인할 수 있습니다.
+이 방법은 아이폰의 Safe Area, 아이패드의 Split View를 정확하게 반영하지 않기 때문에 정확하지는 않습니다.
 
 {% enderror %}
 
 ---
 
-Although most of us are still some years away from shipping SwiftUI in our apps
-(whether by choice or necessity),
-we can all immediately benefit from the order-of-magnitude improvement
-it enables with Xcode 11 on macOS Catalina.
+우리 모두가 SwiftUI를 실제로 앱에 적용하려면 몇 년 남았다고 생각하고 있을 것입니다. (자의든 타의든 말이죠)
+하지만 macOS Catalina의 Xcode 11만 있다면 앞에서 설명한 방법을 통해서 즉시 얻을 수 있는 이득이 많습니다.
 
-By eliminating so much time spent waiting for things to happen,
-we not only get (literally) _hours_ more time each week,
-but we unlock the possibility of maintaining an unbroken flow state during that time.
-Not only that,
-but the convenience of integrated tests
-fundamentally changes the calculus for testing:
-instead of being a rare _"nice to have,"_
-they're the new default.
-Plus:
-these inline previews serve as living documentation
-that can help teams both large and small
-finally get a handle on their design system.
+SwiftUI로 바뀔 때까지 시간을 죽이는 것은 매주 몇 시간씩 날릴 뿐만 아니라, 개발 흐름을 끊기지 않게 해줄 수 있는 가능성을 잃어버리는 것입니다.
+뿐만 아니라 통합 테스팅의 편리함은 근본적으로 테스팅에 대한 인식을 바꿀 것입니다. 지금까진 가끔씩 _"있어서 좋네"_ 였다면 이젠 새로운 기본값이 될거라 생각합니다.
 
-It's hard to overstate how much of a game-changer Xcode Previews are for iOS development,
-and we couldn't be happier to incorporate them into our workflow.
+추가적으로, 이 미리보기 기능은 크고 작은 팀을 위한 라이브 문서로도 활용될 수 있을 것입니다. 추후에는 디자인 시스템에 사용될 수도 있겠죠.
+
+Xcode Preview가 iOS 개발에 있어서 판도를 얼마나 뒤엎을지 평가하는 것은 어렵습니다만, 이 기능을 우리 프로젝트에 붙인다면 그보다 더 행복할 순 없겠죠?
 
 {% asset articles/swiftui-previews.css %}
