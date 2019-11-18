@@ -5,7 +5,7 @@ translator: 김필권
 category: Xcode
 excerpt: >-
   어마어마한 양의 iOS 코드를 다루는 일은 때론 기다림의 연속입니다.
-  하지만 Xcode 11와 SwiftUI가 함께라면 더 이상 기다릴 필요가 없습니다.
+  하지만 Xcode 11이 있다면 더 이상 기다리지 않아도 됩니다.
 status:
   swift: 5.1
 ---
